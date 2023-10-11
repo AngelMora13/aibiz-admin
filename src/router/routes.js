@@ -13,6 +13,13 @@ const routes = [
       { path: "", component: () => import("pages/login/LoginPage.vue") },
     ],
   },
+  {
+    path: "/administracion/empresas",
+    component: () => import("layouts/admin/AdmingLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/empresas/EmpresasPage.vue") },
+    ],
+  },
 
   // Always leave this as last one,
   // but you can also remove it
