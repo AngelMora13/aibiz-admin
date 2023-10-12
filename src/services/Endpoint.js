@@ -20,12 +20,25 @@ const Endpoint = {
     );
   },
   getListSubDominios({ token }) {
-    console.log({ tokenss: token });
     return axios.get(url + "/v1/sub-dominios", {
       headers: {
         Authorization: "bearer " + token,
       },
     });
+  },
+  getListModules() {
+    return axios.get(url + "/v1/modulos");
+  },
+  createSubDominio({ token, empresaData }) {
+    return axios.post(
+      url + "/v1/sub-dominios/create",
+      { empresaData },
+      {
+        headers: {
+          Authorization: "bearer " + token,
+        },
+      }
+    );
   },
 };
 

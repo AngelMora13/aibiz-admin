@@ -10,7 +10,13 @@ import { computed } from 'vue'; import { computed } from 'vue';
         outlined
         color="primary"
       ></q-input>
-      <q-btn rounded color="primary" unelevated class="search-btn">
+      <q-btn
+        rounded
+        color="primary"
+        unelevated
+        class="search-btn"
+        @click="openFormEmpresa = true"
+      >
         Crear Empresa
       </q-btn>
     </div>
@@ -21,15 +27,27 @@ import { computed } from 'vue'; import { computed } from 'vue';
       :columns="headers"
       selection="multiple"
     >
+      <template v-slot:no-data>
+        <div class="full-width row flex-center text-accent q-gutter-sm">
+          <span> No se encontrarón resultados </span>
+        </div>
+      </template>
     </q-table>
+    <q-dialog v-model="openFormEmpresa">
+      <div class="formEmpresa-container">
+        <form-crear-empresa />
+      </div>
+    </q-dialog>
   </q-page>
 </template>
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useUserStore } from "stores/user-store";
 import endpoint from "../../services/Endpoint";
+import FormCrearEmpresa from "src/components/FormCrearEmpresa.vue";
 const userStore = useUserStore();
 const searchInput = ref("");
+const openFormEmpresa = ref(false);
 const headers = computed(() => {
   return [
     {
@@ -102,5 +120,14 @@ const getSubDominios = async () => {
 }
 .search-btn {
   text-transform: capitalize;
+}
+.formEmpresa-container {
+  background: #fff;
+  display: flex;
+  width: 55rem;
+  padding: 1.25rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
 }
 </style>
