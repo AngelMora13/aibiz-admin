@@ -26,11 +26,30 @@ import { computed } from 'vue'; import { computed } from 'vue';
       title="Lista de Empresas"
       :columns="headers"
       selection="multiple"
+      :rows="listEmpresas"
+      row-key="_id"
+      v-model:selected="empresaSelect"
     >
       <template v-slot:no-data>
         <div class="full-width row flex-center text-accent q-gutter-sm">
           <span> No se encontrarón resultados </span>
         </div>
+      </template>
+      <template v-slot:top>
+        <div class="row w-100 justify-between">
+          <h5>Lista de Empresas</h5>
+          <div class="table-btn">
+            <q-btn color="negative" class="q-mr-md" v-if="empresaSelect[0]"
+              >Eliminar</q-btn
+            >
+            <q-btn color="warning" v-if="empresaSelect[0]">Desactivar</q-btn>
+          </div>
+        </div>
+      </template>
+      <template v-slot:body-cell-fechaCreacion="props">
+        <q-td :props="props">
+          {{ JSON.stringify(props) }}
+        </q-td>
       </template>
     </q-table>
     <q-dialog v-model="openFormEmpresa">
@@ -48,6 +67,8 @@ import FormCrearEmpresa from "src/components/FormCrearEmpresa.vue";
 const userStore = useUserStore();
 const searchInput = ref("");
 const openFormEmpresa = ref(false);
+const listEmpresas = ref([]);
+const empresaSelect = ref([]);
 const headers = computed(() => {
   return [
     {
@@ -89,7 +110,8 @@ const getSubDominios = async () => {
   try {
     const token = userStore.$state.token;
     const { data } = await endpoint.getListSubDominios({ token });
-    console.log(data);
+    listEmpresas.value = data;
+    console.log(data, listEmpresas);
   } catch (e) {
     console.log(e);
   }
@@ -129,5 +151,8 @@ const getSubDominios = async () => {
   flex-direction: column;
   align-items: flex-start;
   gap: 1.25rem;
+}
+.table-btn {
+  margin: auto 0;
 }
 </style>

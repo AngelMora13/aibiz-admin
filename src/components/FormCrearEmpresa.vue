@@ -78,7 +78,7 @@
       </q-input>
     </div>
     <q-select
-      v-model="empresaData.moodulos"
+      v-model="empresaData.modulos"
       class="q-mt-lg"
       placeholder="Modulos Disponibles"
       dense
@@ -133,7 +133,7 @@ const empresaData = ref({
   tipoDocumento: "",
   documentoIdentidad: "",
   subDominio: "",
-  moodulos: [],
+  modulos: [],
 });
 const rules = {
   email: [
@@ -161,15 +161,17 @@ const getModules = async () => {
 const crearSubDominio = async () => {
   try {
     const token = userStore.$state.token;
-    empresaData.value.documentoIdentidad = `${empresaData.value.tipoDocumento}-${empresaData.value.documentoIdentidad}`;
+    empresaData.value.documentoIdentidad = `${empresaData.value.tipoDocumento}${empresaData.value.documentoIdentidad}`;
     crearEmpresaForm.value?.validate().then(async (success) => {
       if (success) {
         console.log("formulario validado", success);
-        /*const { data } = await endpoint.createSubDominio({
+        const { data } = await endpoint.createSubDominio({
           token,
           empresaData: empresaData.value,
         });
-        console.log(data);*/
+        console.log(data);
+        empresaData.value = {};
+        console.log(empresaData.value);
       } else {
         console.log("form no valido", success);
       }
