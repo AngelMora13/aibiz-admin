@@ -20,16 +20,12 @@ const Endpoint = {
     );
   },
   getListSubDominios({ token }) {
-    console.log({ token });
-    return axios.get(
-      url + "/v1/sub-dominios",
-      {},
-      {
-        headers: {
-          Authorization: "bearer " + token,
-        },
-      }
-    );
+    console.log({ tokenss: token });
+    return axios.get(url + "/v1/sub-dominios", {
+      headers: {
+        Authorization: "bearer " + token,
+      },
+    });
   },
 };
 
