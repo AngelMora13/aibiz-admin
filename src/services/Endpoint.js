@@ -40,6 +40,28 @@ const Endpoint = {
       }
     );
   },
+  disableManyEmpresas({ token, empresaData }) {
+    return axios.post(
+      url + "/v1/sub-dominios/disabledMany",
+      { empresaData },
+      {
+        headers: {
+          Authorization: "bearer " + token,
+        },
+      }
+    );
+  },
+  deleteManyEmpresas({ token, empresaData }) {
+    return axios.post(
+      url + "/v1/sub-dominios/deleteMany",
+      { empresaData },
+      {
+        headers: {
+          Authorization: "bearer " + token,
+        },
+      }
+    );
+  },
 };
 
 export default Endpoint;

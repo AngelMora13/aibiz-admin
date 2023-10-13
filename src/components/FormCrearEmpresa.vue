@@ -48,7 +48,7 @@
         class="q-mt-lg"
         dense
         outlined
-        color="secundary"
+        color="secondary"
         :rules="rules.requeridos"
       >
       </q-select>

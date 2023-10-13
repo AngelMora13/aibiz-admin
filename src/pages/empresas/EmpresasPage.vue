@@ -39,16 +39,31 @@ import { computed } from 'vue'; import { computed } from 'vue';
         <div class="row w-100 justify-between">
           <h5>Lista de Empresas</h5>
           <div class="table-btn">
-            <q-btn color="negative" class="q-mr-md" v-if="empresaSelect[0]"
+            <q-btn
+              color="negative"
+              class="q-mr-md"
+              v-if="empresaSelect[0]"
+              @click="openAlertDelete"
               >Eliminar</q-btn
             >
-            <q-btn color="warning" v-if="empresaSelect[0]">Desactivar</q-btn>
+            <q-btn
+              color="warning"
+              v-if="empresaSelect[0]"
+              @click="openAlertDisabled"
+              >Desactivar</q-btn
+            >
           </div>
         </div>
       </template>
       <template v-slot:body-cell-fechaCreacion="props">
         <q-td :props="props">
-          {{ JSON.stringify(props) }}
+          {{ date.formatDate(props.value, "DD-MM-YYYY") }}
+        </q-td>
+      </template>
+      <template v-slot:body-cell-acciones="props">
+        <q-td :props="props">
+          <q-btn flat round color="secondary" icon="attachment"></q-btn>
+          <q-btn flat round color="secondary" icon="more_horiz"></q-btn>
         </q-td>
       </template>
     </q-table>
@@ -57,10 +72,29 @@ import { computed } from 'vue'; import { computed } from 'vue';
         <form-crear-empresa />
       </div>
     </q-dialog>
+    <q-dialog v-model="openAlertDisableDelete">
+      <div class="alert-container">
+        <span>
+          Está seguro(a) que desea {{ accionAlert }}
+          {{ empresaSelect.length }} sub-dominios
+        </span>
+        <q-btn
+          v-if="accionAlert === 'desactivar'"
+          color="warmning"
+          class="q-mb-md"
+          @click="disabledMany"
+          >Desactivar
+        </q-btn>
+        <q-btn v-else color="negative" class="q-mb-md" @click="deleteMany"
+          >Eliminar
+        </q-btn>
+      </div>
+    </q-dialog>
   </q-page>
 </template>
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
+import { date } from "quasar";
 import { useUserStore } from "stores/user-store";
 import endpoint from "../../services/Endpoint";
 import FormCrearEmpresa from "src/components/FormCrearEmpresa.vue";
@@ -69,11 +103,14 @@ const searchInput = ref("");
 const openFormEmpresa = ref(false);
 const listEmpresas = ref([]);
 const empresaSelect = ref([]);
+const accionAlert = ref("");
+const openAlertDisableDelete = ref(false);
 const headers = computed(() => {
   return [
     {
       label: "Dominio",
       field: "subDominio",
+      name: "subDominio",
       sortable: true,
     },
     {
@@ -99,7 +136,13 @@ const headers = computed(() => {
     {
       label: "Fecha de Creación",
       field: "fechaCreacion",
+      name: "fechaCreacion",
       sortable: true,
+    },
+    {
+      label: "Acciones",
+      name: "acciones",
+      sortable: false,
     },
   ];
 });
@@ -116,6 +159,55 @@ const getSubDominios = async () => {
     console.log(e);
   }
 };
+const openAlertDisabled = () => {
+  accionAlert.value = "desactivar";
+  openAlertDisableDelete.value = true;
+};
+const disabledMany = async () => {
+  console.log("desactivar");
+  try {
+    const token = userStore.$state.token;
+    const { data } = await endpoint.disableManyEmpresas({
+      token,
+      empresaData: empresaSelect.value,
+    });
+    empresaSelect.value = [];
+    console.log(data);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    openAlertDisableDelete.value = false;
+  }
+};
+const openAlertDelete = () => {
+  accionAlert.value = "eliminar";
+  openAlertDisableDelete.value = true;
+};
+const deleteMany = async () => {
+  console.log("delete");
+  try {
+    const token = userStore.$state.token;
+    const { data } = await endpoint.deleteManyEmpresas({
+      token,
+      empresaData: empresaSelect.value,
+    });
+    empresaSelect.value = [];
+    console.log(data);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    openAlertDisableDelete.value = false;
+  }
+};
+watch(
+  () => openAlertDisableDelete,
+  (value) => {
+    if (!value) {
+      accionAlert.value = "";
+    }
+  },
+  { deep: true }
+);
 </script>
 <style scoped>
 .empresas-page {
@@ -154,5 +246,22 @@ const getSubDominios = async () => {
 }
 .table-btn {
   margin: auto 0;
+}
+.alert-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  font-size: 1rem;
+  color: #7b7b7b;
+  white-space: nowrap;
+  max-width: 800px;
+  padding: 0 1rem;
+}
+.alert-container span {
+  font-size: 1rem;
+  color: #7b7b7b;
+  white-space: nowrap;
+  padding: 1rem;
 }
 </style>
