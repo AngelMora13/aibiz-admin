@@ -7,20 +7,24 @@ export const useUserStore = defineStore("user", {
     token: "",
   }),
   getters: {
-    doubleCount: (state) => "bearer " + state.token,
+    bearerToken: (state) => "bearer " + state.token,
     isLogin: (state) => !!state.token && !!state.user.email,
   },
   actions: {
     setUser(user) {
       this.user = user;
     },
-    setToken(localtoken) {
-      localStorage.setItem("token", localtoken);
-      this.token = localtoken;
+    setToken(token) {
+      localStorage.setItem("token", token);
+      this.token = token;
     },
-    async getUser(localtoken) {
-      console.log({ local: localtoken });
-      return Endpoint.getUserByToken(localtoken);
+    async getUser(token) {
+      return Endpoint.getUserByToken(token);
+    },
+    loginSuccess({ persona, token }) {
+      localStorage.setItem("token", token);
+      this.token = token;
+      this.user = persona;
     },
     logOut() {
       this.user = {};

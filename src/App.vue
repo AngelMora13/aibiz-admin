@@ -7,11 +7,10 @@ import { onMounted } from "vue";
 import { useUserStore } from "stores/user-store";
 const userStore = useUserStore();
 onMounted(async () => {
-  const tokenLocal = localStorage.getItem("token");
-  console.log({ tokenLocal });
-  if (tokenLocal) {
-    userStore.setToken(tokenLocal);
-    const { data } = await userStore.getUser({ token: tokenLocal });
+  const token = localStorage.getItem("token");
+  if (token) {
+    userStore.setToken(token);
+    const { data } = await userStore.getUser({ token });
     userStore.setUser(data);
   }
 });

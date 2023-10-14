@@ -1,5 +1,5 @@
 <template>
-  <q-layout>
+  <q-layout view="lHh lpr lFf">
     <q-header class="q-pa-md bg-white text-primary sombra-1">
       <q-toolbar class="row justify-between">
         <div class="row justify-between w-100" style="gap: 40px">
@@ -48,7 +48,10 @@
             </q-btn>
           </div>
           <div class="navigation-user" v-else>
-            <UserLogout></UserLogout>
+            <UserLogout
+              view-path="/administracion"
+              view-label="Ir al Admin"
+            ></UserLogout>
           </div>
         </div>
       </q-toolbar>

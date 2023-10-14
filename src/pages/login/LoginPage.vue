@@ -1,45 +1,64 @@
 <template>
   <q-page class="login-page row no-wrap">
     <div class="wrap-content col-12 col-md-6">
-      <LoginForm v-if="isLogin"></LoginForm>
+      <LoginForm v-if="isLoginSelected" @login-sucess="handleLogin"></LoginForm>
       <RegistrarForm v-else></RegistrarForm>
     </div>
     <div class="wrap-content col-12 col-md-6" v-if="isDesktop">
       <div
         class="banner"
         :style="{
-          '--bg-color': isLogin ? getCssVar('primary') : getCssVar('secondary'),
+          '--bg-color': isLoginSelected
+            ? getCssVar('primary')
+            : getCssVar('secondary'),
         }"
       ></div>
     </div>
   </q-page>
 </template>
 <script setup>
-import { onMounted, computed, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { onMounted, computed, watch, nextTick } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { Screen } from "quasar";
+import { getCssVar } from "quasar";
 
+import { useUserStore } from "stores/user-store";
 import LoginForm from "components/LoginForm.vue";
 import RegistrarForm from "components/RegistrarForm.vue";
-import { getCssVar } from "quasar";
 
 const router = useRouter();
 const route = useRoute();
-let isLogin = true;
-onMounted(() => {
-  const query = route.query;
-  isLogin = !(query && query["registrar"]);
-});
+const userStore = useUserStore();
+let isLoginSelected = true;
+let routerToAfterLogin = "";
+
 const isDesktop = computed(() => {
   return Screen.gt.sm;
 });
+onMounted(() => {
+  const query = route.query;
+  if (query.to) routerToAfterLogin = decodeURIComponent(query.to);
+  if (routerToAfterLogin && userStore.isLogin)
+    return router.push(routerToAfterLogin);
+  isLoginSelected = !(query && query["registrar"]);
+});
+
+const handleLogin = ({ persona, token }) => {
+  if (persona && persona._id && token) {
+    userStore.loginSuccess({ persona, token });
+  }
+};
 watch(
-  () => {
-    return route.query;
-  },
+  () => route.query,
   (value) => {
-    isLogin = !(value && value["registrar"]);
-    console.log(value);
+    isLoginSelected = !(value && value["registrar"]);
+  }
+);
+watch(
+  () => userStore.isLogin,
+  (value) => {
+    if (routerToAfterLogin) return router.push(routerToAfterLogin);
+    router.push({ name: "home" });
   }
 );
 </script>

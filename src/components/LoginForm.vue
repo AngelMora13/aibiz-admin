@@ -65,10 +65,11 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed, watch, defineEmits } from "vue";
 import { Screen } from "quasar";
 import endpoint from "../services/Endpoint";
 
+const emit = defineEmits(["login-sucess"]);
 const rules = {
   email: [
     (v) => !!v || "Campo obligatorio",
@@ -87,9 +88,7 @@ const loginData = ref({
   password: "angel123",
 });
 
-onMounted(() => {
-  console.log(isFormValid.value);
-});
+onMounted(() => {});
 
 const isDesktop = computed(() => {
   return Screen.gt.sm;
@@ -101,8 +100,7 @@ const handleSubmit = async () => {
   if (!loginData.value.password) return;
   try {
     const { data } = await endpoint.login(loginData.value);
-    localStorage.setItem("token", data.token);
-    console.log(data);
+    emit("login-sucess", data);
   } catch (e) {
     console.log(e);
   }

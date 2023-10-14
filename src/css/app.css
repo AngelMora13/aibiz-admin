@@ -60,6 +60,15 @@
 .w-100 {
   width: 100%;
 }
+.mh-100 {
+  min-height: 100vh;
+}
+.gap-1 {
+  gap: 10px;
+}
+.gap-2 {
+  gap: 20px;
+}
 a {
   text-decoration: none;
 }

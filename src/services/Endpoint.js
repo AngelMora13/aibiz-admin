@@ -1,6 +1,19 @@
-//import axios from "../boot/axios"
 import axios from "axios";
+
 const url = "http://localhost:5000";
+const mainServer = axios.create({
+  baseURL: "http://localhost:5000",
+});
+mainServer.interceptors.request.use(
+  function (config) {
+    const token = localStorage.getItem("token");
+    config.headers.Authorization = `bearer ${token}`;
+    return config;
+  },
+  function (error) {
+    return Promise.reject(error);
+  }
+);
 const Endpoint = {
   login({ email, password }) {
     return axios.post(url + "/v1/auth/login", {
@@ -9,15 +22,7 @@ const Endpoint = {
     });
   },
   getUserByToken({ token }) {
-    return axios.post(
-      url + "/v1/auth/login",
-      {},
-      {
-        headers: {
-          Authorization: "bearer " + token,
-        },
-      }
-    );
+    return mainServer.post(url + "/v1/auth/login", {});
   },
   getListSubDominios({ token }) {
     return axios.get(url + "/v1/sub-dominios", {
