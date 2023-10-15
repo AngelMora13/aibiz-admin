@@ -34,6 +34,7 @@ const router = useRouter();
 const route = useRoute();
 
 onMounted(() => {
+  /*
   if (!userStore.isLogin) {
     router.push({
       path: "/login",
@@ -41,7 +42,7 @@ onMounted(() => {
         to: encodeURIComponent(route.path),
       },
     });
-  }
+  }*/
 });
 </script>
 <style scoped>

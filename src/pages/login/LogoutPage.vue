@@ -1,7 +1,9 @@
 <template>
-  <div class="column justify-center items-center w-100 mh-100">
-    <q-spinner-hourglass color="primary" size="10em" />
-  </div>
+  <q-page class="login-page row no-wrap">
+    <div class="column justify-center items-center w-100 mh-100">
+      <q-spinner-hourglass color="primary" size="10em" />
+    </div>
+  </q-page>
 </template>
 <script setup>
 import { onMounted } from "vue";

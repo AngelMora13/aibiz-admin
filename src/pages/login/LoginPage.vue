@@ -36,10 +36,8 @@ const isDesktop = computed(() => {
   return Screen.gt.sm;
 });
 onMounted(() => {
+  if (userStore.isLogin) router.push({ name: "home" });
   const query = route.query;
-  if (query.to) routerToAfterLogin = decodeURIComponent(query.to);
-  if (routerToAfterLogin && userStore.isLogin)
-    return router.push(routerToAfterLogin);
   isLoginSelected = !(query && query["registrar"]);
 });
 
@@ -49,16 +47,16 @@ const handleLogin = ({ persona, token }) => {
   }
 };
 watch(
-  () => route.query,
+  () => userStore.isLogin,
   (value) => {
-    isLoginSelected = !(value && value["registrar"]);
+    if (routerToAfterLogin && value) return router.push(routerToAfterLogin);
+    router.push({ name: "home" });
   }
 );
 watch(
-  () => userStore.isLogin,
+  () => route.query,
   (value) => {
-    if (routerToAfterLogin) return router.push(routerToAfterLogin);
-    router.push({ name: "home" });
+    isLoginSelected = !(value && value["registrar"]);
   }
 );
 </script>

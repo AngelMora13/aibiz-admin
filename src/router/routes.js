@@ -4,14 +4,27 @@ const routes = [
     name: "home",
     component: () => import("layouts/landing/LandingLayout.vue"),
     children: [
-      { path: "", component: () => import("pages/landing/IndexPage.vue") },
+      {
+        path: "",
+        name: "home",
+        component: () => import("pages/landing/IndexPage.vue"),
+      },
     ],
   },
   {
     path: "/login",
     component: () => import("layouts/login/LoginLayout.vue"),
     children: [
-      { path: "", component: () => import("pages/login/LoginPage.vue") },
+      {
+        path: "",
+        name: "login",
+        component: () => import("pages/login/LoginPage.vue"),
+      },
+      {
+        path: "/logging",
+        name: "do-login",
+        component: () => import("pages/login/LoginLoader.vue"),
+      },
     ],
   },
   {
@@ -23,6 +36,9 @@ const routes = [
   },
   {
     path: "/administracion",
+    meta: {
+      auth: true,
+    },
     component: () => import("layouts/admin/AdmingLayout.vue"),
     children: [
       { path: "", component: () => import("pages/admin/AdminHome.vue") },
