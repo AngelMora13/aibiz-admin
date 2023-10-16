@@ -96,7 +96,9 @@ import { date, Quasar } from "quasar";
 import endpoint from "../../services/Endpoint";
 import SearchInput from "src/components/SearchInput.vue";
 import UsuarioForm from "src/components/UsuarioForm.vue";
+import { useUserStore } from "stores/user-store";
 
+const userStore = useUserStore();
 const searchInput = ref("");
 const usuarios = ref([]);
 const selected = ref([]);
@@ -157,8 +159,9 @@ onMounted(async () => {
 const findUsuarios = async () => {
   try {
     const { data } = await endpoint.getUsuarios();
-    usuarios.value = data;
-    console.log(data);
+    usuarios.value = data.sort((a, b) => {
+      return b.email === userStore.user.email ? 1 : -1;
+    });
   } catch (e) {}
 };
 const handleEditform = (usuario) => {
@@ -211,7 +214,8 @@ const userList = computed({
     return newUsers.filter(
       (user) =>
         user.nombre.toLowerCase().includes(searchInput.value.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchInput.value.toLowerCase())
+        user.email.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        user.telefono.toLowerCase().includes(searchInput.value.toLowerCase())
     );
   },
 });

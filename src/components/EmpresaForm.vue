@@ -135,7 +135,7 @@
             class="text-capitalize"
             @click="openAlertDisabled = true"
           >
-            Desactivar
+            {{ empresaData.activo ? "Desactivar" : "activar" }}
           </q-btn>
           <q-btn
             unelevated
@@ -151,12 +151,16 @@
     </q-form>
     <q-dialog v-model="openAlertDisabled">
       <div class="alert-container">
-        <span> ¿Está seguro(a) que desea desactivar esta empresa? </span>
+        <span>
+          ¿Está seguro(a) que desea
+          {{ empresaData.activo ? "Desactivar" : "Activar" }} esta empresa?
+        </span>
         <q-btn
           color="warning text-capitalize"
           class="q-mb-md"
           @click="emit('desactivar')"
-          >Desactivar
+        >
+          {{ empresaData.activo ? "Desactivar" : "Activar" }}
         </q-btn>
       </div>
     </q-dialog>

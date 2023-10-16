@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const url = "https://aibiz-beta-dev-jath.1.us-1.fl0.io";
+const url = "http://localhost:5000"; //"https://aibiz-beta-dev-jath.1.us-1.fl0.io";
 const mainServer = axios.create({
-  baseURL: "https://aibiz-beta-dev-jath.1.us-1.fl0.io",
+  baseURL: "http://localhost:5000", //"https://aibiz-beta-dev-jath.1.us-1.fl0.io",
 });
 mainServer.interceptors.request.use(
   function (config) {
@@ -46,7 +46,7 @@ const Endpoint = {
     return mainServer.post("/v1/users/deleteMany", usuarios);
   },
   createSubDominio(empresaData) {
-    return mainServer.post(url + "/v1/sub-dominios/create", { empresaData });
+    return mainServer.post(url + "/v1/sub-dominios/create", empresaData);
   },
   updateEmpresa(empresaData) {
     return mainServer.post(url + "/v1/sub-dominios/update/" + empresaData._id, {

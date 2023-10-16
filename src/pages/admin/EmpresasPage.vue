@@ -51,6 +51,13 @@
             </div>
           </div>
         </template>
+        <template v-slot:body-selection="scope">
+          <q-checkbox
+            v-model="scope.selected"
+            :class="{ inactivo: !scope.row.activo }"
+            v-if="scope.row.activo"
+          />
+        </template>
         <template v-slot:body-cell-fechaCreacion="props">
           <q-td :props="props">
             {{ date.formatDate(props.value, "DD-MM-YYYY") }}
@@ -146,9 +153,11 @@ const empresasList = computed({
     return newEmpresas.filter(
       (emp) =>
         emp.razonSocial
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(searchInput.value.toLowerCase()) ||
-        emp.email.toLowerCase().includes(searchInput.value.toLowerCase())
+        emp.email?.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        emp.dominio?.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        emp.telefono?.toLowerCase().includes(searchInput.value.toLowerCase())
     );
   },
 });
@@ -305,6 +314,9 @@ watch(
 );
 </script>
 <style scoped>
+:deep(.inactivo) {
+  border-left: 3px solid rgb(255, 134, 134);
+}
 .page-main {
   padding: 40px;
 }
