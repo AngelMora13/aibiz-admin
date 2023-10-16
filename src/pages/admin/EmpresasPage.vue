@@ -234,13 +234,14 @@ const handleSubmit = async () => {
   } catch (e) {
     console.log(e);
   } finally {
-    // openFormEmpresa.value = false;
+    openFormEmpresa.value = false;
+    getSubDominios();
   }
 };
 const updateEmpresa = async () => {
   console.log("editando ando");
   empresaFormData.value.documentoIdentidad = `${empresaFormData.value.tipoDocumento}${empresaFormData.value.documentoIdentidad}`;
-  endpoint.updateEmpresa(empresaFormData.value);
+  await endpoint.updateEmpresa(empresaFormData.value);
 };
 const disabledEmpresa = async () => {
   console.log("desactivar", empresaFormData.value);

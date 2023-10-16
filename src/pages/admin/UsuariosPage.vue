@@ -158,6 +158,7 @@ const findUsuarios = async () => {
   try {
     const { data } = await endpoint.getUsuarios();
     usuarios.value = data;
+    console.log(data);
   } catch (e) {}
 };
 const handleEditform = (usuario) => {
@@ -169,6 +170,7 @@ const handleSubmit = async () => {
   try {
     if (formType.value === "crear") await createUsuarios();
     else await updateUsuarios();
+    console.log("s");
   } catch (e) {
     console.log(e);
   } finally {
@@ -176,11 +178,11 @@ const handleSubmit = async () => {
     findUsuarios();
   }
 };
-const createUsuarios = async () => {
-  endpoint.createUsuarios(usuarioFormData.value);
+const createUsuarios = () => {
+  return endpoint.createUsuarios(usuarioFormData.value);
 };
-const updateUsuarios = async () => {
-  endpoint.updateUsuarios(usuarioFormData.value);
+const updateUsuarios = () => {
+  return endpoint.updateUsuarios(usuarioFormData.value);
 };
 const deleteUser = async () => {
   try {
