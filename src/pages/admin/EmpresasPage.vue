@@ -156,7 +156,9 @@ const empresasList = computed({
           ?.toLowerCase()
           .includes(searchInput.value.toLowerCase()) ||
         emp.email?.toLowerCase().includes(searchInput.value.toLowerCase()) ||
-        emp.dominio?.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        emp.subDominio
+          ?.toLowerCase()
+          .includes(searchInput.value.toLowerCase()) ||
         emp.telefono?.toLowerCase().includes(searchInput.value.toLowerCase())
     );
   },
