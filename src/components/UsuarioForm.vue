@@ -62,7 +62,13 @@
         v-if="formType === 'editar'"
       >
         <div class="flex-responsive justify-end">
-          <q-btn outline color="negative" class="text-capitalize">
+          <q-btn
+            v-if="!usuarioData.isSuperAdmin"
+            outline
+            color="negative"
+            class="text-capitalize"
+            @click="openAlertDelete = true"
+          >
             Eliminar
           </q-btn>
           <q-btn
@@ -77,6 +83,17 @@
         </div>
       </div>
     </q-form>
+    <q-dialog v-model="openAlertDelete">
+      <div class="alert-container">
+        <span> ¿Está seguro(a) que desea eliminar este usuario? </span>
+        <q-btn
+          color="negative text-capitalize"
+          class="q-mb-md"
+          @click="emit('delete')"
+          >Eliminar
+        </q-btn>
+      </div>
+    </q-dialog>
   </div>
 </template>
 <script setup>
@@ -93,10 +110,10 @@ const props = defineProps({
     type: String,
   },
 });
-const emit = defineEmits(["update:usuario", "submit"]);
+const emit = defineEmits(["update:usuario", "submit", "delete"]);
 const userStore = useUserStore();
 const formRef = ref(null);
-
+const openAlertDelete = ref(false);
 const rules = {
   email: [
     (v) => !!v || "Campo obligatorio",
@@ -156,6 +173,17 @@ watch(
 }
 .flex-responsive .flex-responsive {
   gap: 40px;
+}
+.alert-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  background: #ffff;
+}
+.alert-container > span {
+  padding: 1.25rem 1.25rem 0;
 }
 @media only screen and (max-width: 600px) {
   .flex-responsive,

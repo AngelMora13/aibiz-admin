@@ -14,7 +14,7 @@
         bordered
         :columns="headers"
         selection="multiple"
-        :rows="usuarios"
+        :rows="userList"
         row-key="_id"
         v-model:selected="selected"
         class="q-pa-md"
@@ -34,9 +34,17 @@
           <div class="row w-100 justify-between">
             <h1 class="no-margin titulo-3 titulo-color">Lista de Usuarios</h1>
             <div class="table-btn" v-if="selected[0]">
-              <q-btn color="negative" class="q-mr-md">Eliminar</q-btn>
+              <q-btn
+                color="negative"
+                class="q-mr-md"
+                @click="openAlertDeleteMany = true"
+                >Eliminar</q-btn
+              >
             </div>
           </div>
+        </template>
+        <template v-slot:body-selection="scope">
+          <q-checkbox v-model="scope.selected" v-if="!scope.row.isSuperAdmin" />
         </template>
         <template v-slot:body-cell-fechaCreacion="props">
           <q-td :props="props">
@@ -55,6 +63,19 @@
           </q-td>
         </template>
       </q-table>
+      <q-dialog v-model="openAlertDeleteMany">
+        <div class="alert-container">
+          <span>
+            ¿Está seguro(a) que desea eliminar {{ selected.length }} usuarios?
+          </span>
+          <q-btn
+            color="negative text-capitalize"
+            class="q-mb-md"
+            @click="deleteUsersMany"
+            >Eliminar
+          </q-btn>
+        </div>
+      </q-dialog>
     </div>
     <q-dialog v-model="openForm">
       <q-card class="formEmpresa-container" style="max-width: 800px">
@@ -62,13 +83,14 @@
           v-model:usuario="usuarioFormData"
           :formType="formType"
           @submit="handleSubmit"
+          @delete="deleteUser()"
         ></UsuarioForm>
       </q-card>
     </q-dialog>
   </q-page>
 </template>
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { date, Quasar } from "quasar";
 
 import endpoint from "../../services/Endpoint";
@@ -91,6 +113,7 @@ const usuarioFormDataDefault = ref({
   telefono: "",
 });
 const formType = ref("crear");
+const openAlertDeleteMany = ref(false);
 
 const headers = [
   {
@@ -142,7 +165,6 @@ const handleEditform = (usuario) => {
   usuarioFormData.value = { ...usuario };
   openForm.value = true;
 };
-
 const handleSubmit = async () => {
   try {
     if (formType.value === "crear") await createUsuarios();
@@ -160,7 +182,37 @@ const createUsuarios = async () => {
 const updateUsuarios = async () => {
   endpoint.updateUsuarios(usuarioFormData.value);
 };
+const deleteUser = async () => {
+  try {
+    await endpoint.deleteUsuarios(usuarioFormData.value);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    openForm.value = false;
+    findUsuarios();
+  }
+};
+const deleteUsersMany = async () => {
+  try {
+    await endpoint.deleteManyUsuarios(selected.value);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    openAlertDeleteMany.value = false;
+    findUsuarios();
+  }
+};
 
+const userList = computed({
+  get() {
+    let newUsers = usuarios.value;
+    return newUsers.filter(
+      (user) =>
+        user.nombre.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchInput.value.toLowerCase())
+    );
+  },
+});
 watch(
   () => openForm.value,
   (value) => {
@@ -174,6 +226,17 @@ watch(
 <style scoped>
 .page-main {
   padding: 40px;
+}
+.alert-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  background: #ffff;
+}
+.alert-container > span {
+  padding: 1.25rem 1.25rem 0;
 }
 @media only screen and (max-width: 600px) {
   .page-main {

@@ -127,7 +127,12 @@
       >
         <q-btn flat color="#C4C4C4" class="color-disabled"> Eliminar </q-btn>
         <div class="flex-responsive">
-          <q-btn outline color="secondary" class="text-capitalize">
+          <q-btn
+            outline
+            color="secondary"
+            class="text-capitalize"
+            @click="openAlertDisabled = true"
+          >
             Desactivar
           </q-btn>
           <q-btn
@@ -135,12 +140,24 @@
             color="primary"
             class="text-capitalize"
             :disable="!isFormValid"
+            @click="emit('submit')"
           >
             Guardar
           </q-btn>
         </div>
       </div>
     </q-form>
+    <q-dialog v-model="openAlertDisabled">
+      <div class="alert-container">
+        <span> ¿Está seguro(a) que desea desactivar esta empresa? </span>
+        <q-btn
+          color="warning text-capitalize"
+          class="q-mb-md"
+          @click="emit('desactivar')"
+          >Desactivar
+        </q-btn>
+      </div>
+    </q-dialog>
   </div>
 </template>
 <script setup>
@@ -157,11 +174,12 @@ const props = defineProps({
     type: String,
   },
 });
-const emit = defineEmits(["update:empresa"]);
+const emit = defineEmits(["update:empresa", "desactivar", "submit"]);
 const userStore = useUserStore();
 const crearEmpresaForm = ref(null);
 const typesDocument = ["J", "V"];
 const listOfModules = ref([]);
+const openAlertDisabled = ref(false);
 /*
 const empresaData = ref({
   razonSocial: "",
@@ -251,6 +269,17 @@ watch(
 }
 .flex-responsive .flex-responsive {
   gap: 40px;
+}
+.alert-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  background: #ffff;
+}
+.alert-container > span {
+  padding: 1.25rem 1.25rem 0;
 }
 @media only screen and (max-width: 600px) {
   .flex-responsive,

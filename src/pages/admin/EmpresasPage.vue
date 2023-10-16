@@ -14,7 +14,7 @@
         bordered
         :columns="headers"
         selection="multiple"
-        :rows="listEmpresas"
+        :rows="empresasList"
         row-key="_id"
         v-model:selected="empresaSelect"
         class="q-pa-md"
@@ -74,6 +74,8 @@
         <EmpresaForm
           v-model:empresa="empresaFormData"
           :formType="formType"
+          @desactivar="disabledEmpresa"
+          @submit="handleSubmit"
         ></EmpresaForm>
       </div>
     </q-dialog>
@@ -133,6 +135,18 @@ const empresaFormDataDefault = ref({
   modulos: [],
 });
 const formType = ref("crear");
+const empresasList = computed({
+  get() {
+    let newEmpresas = listEmpresas.value;
+    return newEmpresas.filter(
+      (emp) =>
+        emp.razonSocial
+          .toLowerCase()
+          .includes(searchInput.value.toLowerCase()) ||
+        emp.email.toLowerCase().includes(searchInput.value.toLowerCase())
+    );
+  },
+});
 
 const headers = computed(() => {
   return [
@@ -187,8 +201,7 @@ onMounted(() => {
 });
 const getSubDominios = async () => {
   try {
-    const token = userStore.$state.token;
-    const { data } = await endpoint.getListSubDominios({ token });
+    const { data } = await endpoint.getListSubDominios();
     listEmpresas.value = data;
     console.log(data, listEmpresas);
   } catch (e) {
@@ -207,18 +220,38 @@ const handleEditform = (empresa) => {
   };
   openFormEmpresa.value = true;
 };
+const handleSubmit = async () => {
+  try {
+    if (formType.value === "crear")
+      return console.log("recuerda agregar el crear");
+    else await updateEmpresa();
+  } catch (e) {
+    console.log(e);
+  } finally {
+    // openFormEmpresa.value = false;
+  }
+};
+const updateEmpresa = async () => {
+  console.log("editando ando");
+  endpoint.updateEmpresa(empresaFormData.value);
+};
+const disabledEmpresa = async () => {
+  console.log("desactivar", empresaFormData.value);
+  try {
+    await endpoint.disabledEmpresa(empresaFormData.value);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    openFormEmpresa.value = false;
+  }
+};
 const openAlertDisabled = () => {
   accionAlert.value = "desactivar";
   openAlertDisableDelete.value = true;
 };
 const disabledMany = async () => {
-  console.log("desactivar");
   try {
-    const token = userStore.$state.token;
-    const { data } = await endpoint.disableManyEmpresas({
-      token,
-      empresaData: empresaSelect.value,
-    });
+    const { data } = await endpoint.disableManyEmpresas(empresaSelect.value);
     empresaSelect.value = [];
     console.log(data);
   } catch (e) {
@@ -234,11 +267,7 @@ const openAlertDelete = () => {
 const deleteMany = async () => {
   console.log("delete");
   try {
-    const token = userStore.$state.token;
-    const { data } = await endpoint.deleteManyEmpresas({
-      token,
-      empresaData: empresaSelect.value,
-    });
+    const { data } = await endpoint.deleteManyEmpresas(empresaSelect.value);
     empresaSelect.value = [];
     console.log(data);
   } catch (e) {

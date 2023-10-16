@@ -24,12 +24,8 @@ const Endpoint = {
   getUserByToken({ token }) {
     return mainServer.post(url + "/v1/auth/login", {});
   },
-  getListSubDominios({ token }) {
-    return axios.get(url + "/v1/sub-dominios", {
-      headers: {
-        Authorization: "bearer " + token,
-      },
-    });
+  getListSubDominios() {
+    return mainServer.get(url + "/v1/sub-dominios");
   },
   getListModules() {
     return axios.get(url + "/v1/modulos");
@@ -43,38 +39,35 @@ const Endpoint = {
   updateUsuarios(usuario) {
     return mainServer.post("/v1/users/update/" + usuario._id, usuario);
   },
-  createSubDominio({ token, empresaData }) {
-    return axios.post(
-      url + "/v1/sub-dominios/create",
-      { empresaData },
-      {
-        headers: {
-          Authorization: "bearer " + token,
-        },
-      }
+  deleteUsuarios(usuario) {
+    return mainServer.delete("/v1/users/delete/" + usuario._id);
+  },
+  deleteManyUsuarios(usuarios) {
+    return mainServer.post("/v1/users/deleteMany", usuarios);
+  },
+  createSubDominio(empresaData) {
+    return mainServer.post(url + "/v1/sub-dominios/create", { empresaData });
+  },
+  updateEmpresa(empresaData) {
+    return mainServer.post(url + "/v1/sub-dominios/update/" + empresaData._id, {
+      empresaData,
+    });
+  },
+  disableManyEmpresas(empresaData) {
+    return mainServer.post(url + "/v1/sub-dominios/disabledMany", {
+      empresaData,
+    });
+  },
+  disabledEmpresa(empresaData) {
+    return mainServer.post(
+      url + "/v1/sub-dominios/disabled/" + empresaData._id,
+      { empresaData }
     );
   },
-  disableManyEmpresas({ token, empresaData }) {
-    return axios.post(
-      url + "/v1/sub-dominios/disabledMany",
-      { empresaData },
-      {
-        headers: {
-          Authorization: "bearer " + token,
-        },
-      }
-    );
-  },
-  deleteManyEmpresas({ token, empresaData }) {
-    return axios.post(
-      url + "/v1/sub-dominios/deleteMany",
-      { empresaData },
-      {
-        headers: {
-          Authorization: "bearer " + token,
-        },
-      }
-    );
+  deleteManyEmpresas(empresaData) {
+    return mainServer.post(url + "/v1/sub-dominios/deleteMany", {
+      empresaData,
+    });
   },
 };
 
