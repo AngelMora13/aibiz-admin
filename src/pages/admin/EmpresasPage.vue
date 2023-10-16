@@ -216,8 +216,9 @@ const handleEditform = (empresa) => {
     ...empresa,
     tipoDocumento: tipoDocumento,
     documentoIdentidad: documentoIdentidad,
-    modulos: empresa.modulosId,
+    modulos: empresa.modulosId || [],
   };
+  console.log(empresa.modulos, empresa.modulosId);
   openFormEmpresa.value = true;
 };
 const handleSubmit = async () => {

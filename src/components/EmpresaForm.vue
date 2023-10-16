@@ -104,6 +104,7 @@
               class="q-pa-md"
             >
               {{
+                scope.opt?.nombre ||
                 listOfModules.find((e) => e._id === scope.opt)?.nombre ||
                 "Modulo no soportado"
               }}
