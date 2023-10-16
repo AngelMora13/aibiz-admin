@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const url = "http://localhost:5000"; //"https://aibiz-beta-dev-jath.1.us-1.fl0.io";
+const url = "https://aibiz-beta-dev-jath.1.us-1.fl0.io"; // "http://localhost:5000";;
 const mainServer = axios.create({
-  baseURL: "http://localhost:5000", //"https://aibiz-beta-dev-jath.1.us-1.fl0.io",
+  baseURL: url, //"https://aibiz-beta-dev-jath.1.us-1.fl0.io",
 });
 mainServer.interceptors.request.use(
   function (config) {
