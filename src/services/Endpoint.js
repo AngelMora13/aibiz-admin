@@ -34,6 +34,15 @@ const Endpoint = {
   getListModules() {
     return axios.get(url + "/v1/modulos");
   },
+  getUsuarios() {
+    return mainServer.get("/v1/users");
+  },
+  createUsuarios(usuario) {
+    return mainServer.post("/v1/users/create/admi", usuario);
+  },
+  updateUsuarios(usuario) {
+    return mainServer.post("/v1/users/update/" + usuario._id, usuario);
+  },
   createSubDominio({ token, empresaData }) {
     return axios.post(
       url + "/v1/sub-dominios/create",

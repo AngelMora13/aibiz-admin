@@ -40,7 +40,7 @@
         </label>
       </div>
     </q-form>
-    <a class="w-100 text-primary">¿Olvidaste tu contraseña?</a>
+    <a class="w-100 text-primary" v-if="false">¿Olvidaste tu contraseña?</a>
     <q-btn
       rounded
       color="primary"

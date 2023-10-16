@@ -1,75 +1,80 @@
-import { computed } from 'vue'; import { computed } from 'vue';
 <template>
-  <q-page style="background: rgba(196, 196, 196, 0.2)" class="empresas-page">
-    <div class="search-container">
-      <q-input
-        v-model="searchInput"
-        class="search-input"
-        placeholder="Buscar..."
-        dense
-        outlined
-        color="primary"
-      ></q-input>
-      <q-btn
-        rounded
-        color="primary"
-        unelevated
-        class="search-btn"
-        @click="openFormEmpresa = true"
-      >
-        Crear Empresa
-      </q-btn>
-    </div>
-    <q-table
-      flat
-      bordered
-      title="Lista de Empresas"
-      :columns="headers"
-      selection="multiple"
-      :rows="listEmpresas"
-      row-key="_id"
-      v-model:selected="empresaSelect"
+  <q-page class="column gap-2 page-main overflow-auto">
+    <SearchInput
+      v-model:searchInput="searchInput"
+      textBtn="Crear Empresa"
+      @openDialog="(value) => (openFormEmpresa = value)"
+    ></SearchInput>
+    <div
+      class="overflow-auto"
+      style="max-width: 100%; background-color: transparent"
     >
-      <template v-slot:no-data>
-        <div class="full-width row flex-center text-accent q-gutter-sm">
-          <span> No se encontrarón resultados </span>
-        </div>
-      </template>
-      <template v-slot:top>
-        <div class="row w-100 justify-between">
-          <h5>Lista de Empresas</h5>
-          <div class="table-btn">
-            <q-btn
-              color="negative"
-              class="q-mr-md"
-              v-if="empresaSelect[0]"
-              @click="openAlertDelete"
-              >Eliminar</q-btn
-            >
-            <q-btn
-              color="warning"
-              v-if="empresaSelect[0]"
-              @click="openAlertDisabled"
-              >Desactivar</q-btn
-            >
+      <q-table
+        flat
+        bordered
+        :columns="headers"
+        selection="multiple"
+        :rows="listEmpresas"
+        row-key="_id"
+        v-model:selected="empresaSelect"
+        class="q-pa-md"
+        table-header-class="texto-th"
+        :selected-rows-label="(n) => n + ' seleccionados'"
+        rows-per-page-label="Filas por página"
+        :pagination-label="
+          (first, end, total) => first + ' - ' + end + ' de ' + total
+        "
+      >
+        <template v-slot:no-data>
+          <div class="full-width row flex-center text-accent q-gutter-sm">
+            <span> No se encontrarón resultados </span>
           </div>
-        </div>
-      </template>
-      <template v-slot:body-cell-fechaCreacion="props">
-        <q-td :props="props">
-          {{ date.formatDate(props.value, "DD-MM-YYYY") }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-acciones="props">
-        <q-td :props="props">
-          <q-btn flat round color="secondary" icon="attachment"></q-btn>
-          <q-btn flat round color="secondary" icon="more_horiz"></q-btn>
-        </q-td>
-      </template>
-    </q-table>
+        </template>
+        <template v-slot:top>
+          <div class="row w-100 justify-between">
+            <h1 class="no-margin titulo-3 titulo-color">Lista de Empresas</h1>
+            <div class="table-btn">
+              <q-btn
+                color="negative"
+                class="q-mr-md"
+                v-if="empresaSelect[0]"
+                @click="openAlertDelete"
+                >Eliminar</q-btn
+              >
+              <q-btn
+                color="warning"
+                v-if="empresaSelect[0]"
+                @click="openAlertDisabled"
+                >Desactivar</q-btn
+              >
+            </div>
+          </div>
+        </template>
+        <template v-slot:body-cell-fechaCreacion="props">
+          <q-td :props="props">
+            {{ date.formatDate(props.value, "DD-MM-YYYY") }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-acciones="props">
+          <q-td :props="props">
+            <q-btn flat round color="secondary" icon="attachment"></q-btn>
+            <q-btn
+              flat
+              round
+              color="secondary"
+              icon="more_horiz"
+              @click="handleEditform(props.row)"
+            ></q-btn>
+          </q-td>
+        </template>
+      </q-table>
+    </div>
     <q-dialog v-model="openFormEmpresa">
-      <div class="formEmpresa-container">
-        <form-crear-empresa />
+      <div class="formEmpresa-container" style="max-width: 800px">
+        <EmpresaForm
+          v-model:empresa="empresaFormData"
+          :formType="formType"
+        ></EmpresaForm>
       </div>
     </q-dialog>
     <q-dialog v-model="openAlertDisableDelete">
@@ -97,51 +102,82 @@ import { ref, computed, onMounted, watch } from "vue";
 import { date } from "quasar";
 import { useUserStore } from "stores/user-store";
 import endpoint from "../../services/Endpoint";
-import FormCrearEmpresa from "src/components/FormCrearEmpresa.vue";
+import EmpresaForm from "src/components/EmpresaForm.vue";
+import SearchInput from "src/components/SearchInput.vue";
+
 const userStore = useUserStore();
 const searchInput = ref("");
+
 const openFormEmpresa = ref(false);
 const listEmpresas = ref([]);
 const empresaSelect = ref([]);
 const accionAlert = ref("");
 const openAlertDisableDelete = ref(false);
+
+const empresaFormData = ref({
+  razonSocial: "",
+  email: "",
+  telefono: "",
+  tipoDocumento: "",
+  documentoIdentidad: "",
+  subDominio: "",
+  modulos: [],
+});
+const empresaFormDataDefault = ref({
+  razonSocial: "",
+  email: "",
+  telefono: "",
+  tipoDocumento: "",
+  documentoIdentidad: "",
+  subDominio: "",
+  modulos: [],
+});
+const formType = ref("crear");
+
 const headers = computed(() => {
   return [
     {
       label: "Dominio",
       field: "subDominio",
       name: "subDominio",
+      align: "left",
       sortable: true,
     },
     {
       label: "Razón Social",
       field: "razonSocial",
+      align: "left",
       sortable: true,
     },
     {
       label: "Documento de Identidad",
       field: "documentoIdentidad",
+      align: "left",
       sortable: true,
     },
     {
       label: "Email",
       field: "email",
+      align: "left",
       sortable: true,
     },
     {
       label: "Teléfono",
       field: "telefono",
+      align: "left",
       sortable: true,
     },
     {
       label: "Fecha de Creación",
       field: "fechaCreacion",
       name: "fechaCreacion",
+      align: "left",
       sortable: true,
     },
     {
       label: "Acciones",
       name: "acciones",
+      align: "left",
       sortable: false,
     },
   ];
@@ -158,6 +194,18 @@ const getSubDominios = async () => {
   } catch (e) {
     console.log(e);
   }
+};
+const handleEditform = (empresa) => {
+  formType.value = "editar";
+  const tipoDocumento = empresa.documentoIdentidad.slice(0, 1);
+  const documentoIdentidad = empresa.documentoIdentidad.slice(1);
+  empresaFormData.value = {
+    ...empresa,
+    tipoDocumento: tipoDocumento,
+    documentoIdentidad: documentoIdentidad,
+    modulos: empresa.modulosId,
+  };
+  openFormEmpresa.value = true;
 };
 const openAlertDisabled = () => {
   accionAlert.value = "desactivar";
@@ -208,38 +256,27 @@ watch(
   },
   { deep: true }
 );
+watch(
+  () => openFormEmpresa.value,
+  (value) => {
+    if (!value) {
+      formType.value = "crear";
+      empresaFormData.value = empresaFormDataDefault.value;
+    }
+  }
+);
 </script>
 <style scoped>
-.empresas-page {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding: 3rem;
+.page-main {
+  padding: 40px;
 }
-.search-container {
-  display: flex;
-  gap: 0.625rem;
-  justify-content: center;
-  align-items: center;
-  padding: 1.25rem;
-  background: #ffff;
-  border-radius: 0.625rem;
-  border: 1px solid #c4c4c4;
-}
-.search-input {
-  display: flex;
-  align-items: flex-start;
-  gap: 1.25rem;
-  flex: 1 0 0;
-}
-.search-btn {
-  text-transform: capitalize;
+:deep(.q-table__top) {
+  padding: 0 0 20px 0;
 }
 .formEmpresa-container {
   background: #fff;
   display: flex;
   width: 55rem;
-  padding: 1.25rem;
   flex-direction: column;
   align-items: flex-start;
   gap: 1.25rem;
@@ -263,5 +300,10 @@ watch(
   color: #7b7b7b;
   white-space: nowrap;
   padding: 1rem;
+}
+@media only screen and (max-width: 600px) {
+  .page-main {
+    padding: 20px 10px;
+  }
 }
 </style>

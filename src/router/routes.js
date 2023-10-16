@@ -41,10 +41,20 @@ const routes = [
     },
     component: () => import("layouts/admin/AdmingLayout.vue"),
     children: [
-      { path: "", component: () => import("pages/admin/AdminHome.vue") },
+      {
+        path: "",
+        name: "administracion",
+        component: () => import("pages/admin/AdminHome.vue"),
+      },
       {
         path: "empresas",
+        name: "empresas",
         component: () => import("pages/admin/EmpresasPage.vue"),
+      },
+      {
+        path: "usuarios",
+        name: "usuarios",
+        component: () => import("src/pages/admin/UsuariosPage.vue"),
       },
     ],
   },

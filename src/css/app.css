@@ -16,6 +16,12 @@
     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
     sans-serif;
 }
+body {
+  --titulo-color: #151730;
+  --texto-color: #1a232c;
+  --texto-input-light: #b6b6b6;
+  --color-disabled: #c4c4c4;
+}
 .sombra-1 {
   box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.1);
 }
@@ -51,11 +57,20 @@
 .texto-4 {
   font-size: 0.875rem;
 }
+.texto-th,
+.texto-th th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--titulo-color);
+}
 .titulo-color {
-  color: #151730;
+  color: var(--titulo-color);
 }
 .texto-color {
-  color: #1a232c;
+  color: var(--texto-color);
+}
+.color-disabled {
+  color: var(--color-disabled);
 }
 .w-100 {
   width: 100%;
@@ -74,4 +89,12 @@ a {
 }
 a:visited {
   color: currentColor;
+}
+.flex-responsive {
+  display: flex;
+}
+@media only screen and (max-width: 600px) {
+  .flex-responsive {
+    flex-direction: column;
+  }
 }

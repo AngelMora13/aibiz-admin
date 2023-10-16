@@ -38,7 +38,6 @@ watch(
 watch(
   () => userStore.isLoginLoading,
   (value) => {
-    console.log(value);
     if (value === false && !userStore.isLogin) router.push({ name: "login" });
   }
 );
