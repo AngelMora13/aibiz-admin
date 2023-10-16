@@ -84,8 +84,8 @@ const rules = {
 const isFormValid = ref(false);
 const loginForm = ref(null);
 const loginData = ref({
-  email: "angelmorab13@gmail.com",
-  password: "angel123",
+  email: "",
+  password: "",
 });
 
 onMounted(() => {});
