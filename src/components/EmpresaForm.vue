@@ -3,7 +3,7 @@
     <h3 class="titulo-color titulo-3 q-ma-none text-capitalize">
       {{ formType }} Empresa
     </h3>
-    <q-form ref="crearEmpresaForm" class="w-100" no-error-focus>
+    <q-form ref="empresaForm" class="w-100" no-error-focus>
       <div class="row q-col-gutter-md">
         <q-input
           v-model="empresaData.razonSocial"
@@ -178,7 +178,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:empresa", "desactivar", "submit"]);
 const userStore = useUserStore();
-const crearEmpresaForm = ref(null);
+const empresaForm = ref(null);
 const typesDocument = ["J", "V"];
 const listOfModules = ref([]);
 const openAlertDisabled = ref(false);
@@ -213,6 +213,11 @@ const empresaData = computed({
 });
 const isFormValid = ref(false);
 onMounted(() => {
+  if (props.formType === "editar") {
+    empresaForm.value?.validate().then((success) => {
+      if (success) isFormValid.value = success;
+    });
+  }
   getModules();
 });
 const getModules = async () => {
@@ -227,7 +232,7 @@ const crearSubDominio = async () => {
   try {
     const token = userStore.$state.token;
     empresaData.value.documentoIdentidad = `${empresaData.value.tipoDocumento}${empresaData.value.documentoIdentidad}`;
-    crearEmpresaForm.value?.validate().then(async (success) => {
+    empresaForm.value?.validate().then(async (success) => {
       if (success) {
         console.log("formulario validado", success);
         const { data } = await endpoint.createSubDominio({
@@ -248,7 +253,7 @@ const crearSubDominio = async () => {
 watch(
   () => empresaData,
   (value) => {
-    crearEmpresaForm.value?.validate().then((success) => {
+    empresaForm.value?.validate().then((success) => {
       isFormValid.value = success;
     });
   },
