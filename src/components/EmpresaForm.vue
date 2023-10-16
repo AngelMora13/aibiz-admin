@@ -78,7 +78,7 @@
           </template>
         </q-input>
         <q-select
-          v-model="empresaData.modulos"
+          v-model="empresaData.modulosId"
           class="col-12"
           placeholder="Modulos Disponibles"
           dense
@@ -87,6 +87,7 @@
           stack-label
           option-label="nombre"
           option-value="_id"
+          emit-value
           outlined
           color="primary"
         >

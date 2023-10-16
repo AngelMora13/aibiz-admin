@@ -36,13 +36,14 @@
             <div class="table-btn">
               <q-btn
                 color="negative"
-                class="q-mr-md"
-                v-if="empresaSelect[0]"
+                class="q-mr-md text-capitalize"
+                v-if="false"
                 @click="openAlertDelete"
                 >Eliminar</q-btn
               >
               <q-btn
                 color="warning"
+                class="text-capitalize"
                 v-if="empresaSelect[0]"
                 @click="openAlertDisabled"
                 >Desactivar</q-btn
@@ -87,12 +88,16 @@
         </span>
         <q-btn
           v-if="accionAlert === 'desactivar'"
-          color="warmning"
-          class="q-mb-md"
+          color="warning"
+          class="q-mb-md text-capitalize"
           @click="disabledMany"
           >Desactivar
         </q-btn>
-        <q-btn v-else color="negative" class="q-mb-md" @click="deleteMany"
+        <q-btn
+          v-else
+          color="negative"
+          class="q-mb-md text-capitalize"
+          @click="deleteMany"
           >Eliminar
         </q-btn>
       </div>
@@ -234,6 +239,7 @@ const handleSubmit = async () => {
 };
 const updateEmpresa = async () => {
   console.log("editando ando");
+  empresaFormData.value.documentoIdentidad = `${empresaFormData.value.tipoDocumento}${empresaFormData.value.documentoIdentidad}`;
   endpoint.updateEmpresa(empresaFormData.value);
 };
 const disabledEmpresa = async () => {
@@ -244,6 +250,7 @@ const disabledEmpresa = async () => {
     console.log(e);
   } finally {
     openFormEmpresa.value = false;
+    getSubDominios();
   }
 };
 const openAlertDisabled = () => {
