@@ -16,7 +16,7 @@ jobs:
           npm install
           quasar build
         env:
-          VUE_API_ENDPOINT: "https://aibiz-web.azurewebsites.net/v1"
+          VUE_API_ENDPOINT: "$(VUE_API_ENDPOINT)"
           VUE_ROUTER_MODE: "history"
         workingDirectory: "$(Build.SourcesDirectory)"
         displayName: "install Quasar CLI and build app"
