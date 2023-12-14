@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const url = "https://aibiz-beta-dev-jath.1.us-1.fl0.io"; // "http://localhost:5000";;
+const url = process.env.VUE_API_ENDPOINT;
 const mainServer = axios.create({
-  baseURL: url, //"https://aibiz-beta-dev-jath.1.us-1.fl0.io",
+  baseURL: url,
 });
 mainServer.interceptors.request.use(
   function (config) {
