@@ -34,5 +34,5 @@ jobs:
           workingDirectory: "$(Build.ArtifactStagingDirectory)"
           app_location: "dist/spa/"
           is_static_export: true
-          azure_static_web_apps_api_token: "b23b675c3325bee47a2f3607438f39ffd176ed667c13adb6439d769534971d6f4-5b90555a-a18c-4a8b-b5ae-b79f3a9f204f00f131436"
+          azure_static_web_apps_api_token: "95e29ac6902f77d67002bbe8c28421c09cc28609e841bd5fc4c10a58882ba7ff4-40cab8d9-1d0b-4a73-b06e-e0f546306566010285191"
           production_branch: "master"
