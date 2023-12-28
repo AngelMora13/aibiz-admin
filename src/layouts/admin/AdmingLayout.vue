@@ -74,6 +74,13 @@
             <q-item-section class="titulo-color"> Usuarios </q-item-section>
           </q-item>
           <q-separator color="secondary" class="q-mt-sm q-mb-xl" size="2px" />
+          <q-item :to="{ name: 'monedas' }" exact exact-active-class="selected">
+            <q-item-section avatar>
+              <q-icon name="paid" />
+            </q-item-section>
+            <q-item-section class="titulo-color"> Monedas </q-item-section>
+          </q-item>
+          <q-separator color="secondary" class="q-mt-sm q-mb-xl" size="2px" />
         </q-list>
       </q-scroll-area>
     </q-drawer>

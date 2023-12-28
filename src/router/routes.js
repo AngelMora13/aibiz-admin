@@ -56,6 +56,11 @@ const routes = [
         name: "usuarios",
         component: () => import("src/pages/admin/UsuariosPage.vue"),
       },
+      {
+        path: "monedas",
+        name: "monedas",
+        component: () => import("src/pages/admin/MonedasPage.vue"),
+      },
     ],
   },
 
