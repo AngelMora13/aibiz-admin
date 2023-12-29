@@ -66,8 +66,18 @@
           v-model:pagination="paginationTasas"
           @request="handleTableTasas"
           :loading="loaderTasas"
-          class="col-12"
+          class="col-12 q-my-md"
         >
+          <template v-slot:body-cell-fecha="{ row }">
+            <td>
+              {{ date.formatDate(row.fecha, "DD-MM-YYYY") }}
+            </td>
+          </template>
+          <template v-slot:body-cell-monedaPrinpal="{ row }">
+            <td style="text-align: center">
+              {{ row.moneda.monedaNombre }}
+            </td>
+          </template>
         </q-table>
       </div>
       <q-dialog v-model="openForMoneda" @keydown.esc="openForMoneda = false">
@@ -166,12 +176,55 @@ const headerMonedas = computed(() => {
   return header;
 });
 const headerTasas = computed(() => {
-  const header = [];
+  const header = [
+    {
+      name: "fecha",
+      align: "center",
+      label: "Fecha",
+      field: "fecha",
+      sortable: false,
+    },
+    {
+      name: "monedaPrinpal",
+      align: "center",
+      label: "Moneda Principal",
+      field: "moneda",
+      sortable: false,
+    },
+  ];
+  const cabezales = [];
+  for (const p of tasasBancarias.value) {
+    const key = Object.keys(p);
+    cabezales.push(...key);
+  }
+  for (const c of cabezales) {
+    if (
+      c === "_id" ||
+      c === "monedas" ||
+      c === "fecha" ||
+      c === "monedaPrincipal" ||
+      c === "moneda"
+    )
+      continue;
+    header.push({
+      name: c,
+      align: "center",
+      label: c,
+      field: c,
+      format: (val, row) =>
+        Number(val).toLocaleString("de-DE", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+      style: "text-align: right",
+      sortable: false,
+    });
+  }
   return header;
 });
 onMounted(async () => {
   getListMonedas();
-  //getTasasBancarias();
+  getTasasBancarias();
 });
 const getListMonedas = async () => {
   loaderMonedas.value = true;
@@ -251,6 +304,7 @@ const getTasasBancarias = async () => {
       body,
     });
     tasasBancarias.value = data.tasas || [];
+    console.log(data.tasas);
     paginationTasas.value.rowsNumber = data.cantidad || 0;
   } catch (e) {
     console.log(e);
