@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const url = process.env.VUE_API_ENDPOINT;
+console.log(url);
 const mainServer = axios.create({
   baseURL: url,
 });
@@ -20,6 +21,9 @@ const Endpoint = {
       email,
       password,
     });
+  },
+  monedas({ path, body }) {
+    return mainServer.post(url + `/v1/monedas/${path}`, body);
   },
   getUserByToken({ token }) {
     return mainServer.post(url + "/v1/auth/login", {});
