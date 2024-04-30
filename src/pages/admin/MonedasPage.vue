@@ -1,5 +1,5 @@
 <template>
-  <q-page class="column gap-2 page-main overflow-auto">
+  <q-page class="gap-2 page-main overflow-auto">
     <div>
       <div class="row justify-center" style="max-width: 100%">
         <q-table
@@ -21,11 +21,20 @@
                 <q-btn
                   color="black"
                   class="text-white text-capitalize"
-                  @click="openForMoneda = true"
+                  :loading="isExcelLoading"
+                  @click="excelInput && excelInput.pickFiles()"
                 >
-                  <q-icon name="add" class="q-mr-sm"></q-icon>Agregar
-                  Moneda</q-btn
+                  <q-icon name="cloud_upload" class="q-mr-sm"></q-icon>
+                  Agregar Tasas Bancarias
+                </q-btn>
+                <q-file
+                  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                  class="hidden"
+                  ref="excelInput"
+                  v-model="excelFile"
+                  @update:model-value="handleSaveFile"
                 >
+                </q-file>
               </div>
             </div>
           </template>
@@ -68,14 +77,9 @@
           :loading="loaderTasas"
           class="col-12 q-my-md"
         >
-          <template v-slot:body-cell-fecha="{ row }">
+          <template v-slot:body-cell-fechaValor="{ row }">
             <td>
-              {{ date.formatDate(row.fecha, "DD-MM-YYYY") }}
-            </td>
-          </template>
-          <template v-slot:body-cell-monedaPrinpal="{ row }">
-            <td style="text-align: center">
-              {{ row.moneda.monedaNombre }}
+              {{ qDate(row.fechaValor).format("DD-MM-YYYY") }}
             </td>
           </template>
         </q-table>
@@ -119,12 +123,17 @@
 </template>
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
-import { date, Quasar } from "quasar";
+import { qDate } from "src/utils/qDate";
+import XLSX from "xlsx";
 
 import endpoint from "../../services/Endpoint";
 import { useUserStore } from "stores/user-store";
 import FormMoneda from "src/components/FormMoneda.vue";
 import Endpoint from "../../services/Endpoint";
+
+const excelInput = ref(null);
+const excelFile = ref(null);
+const isExcelLoading = ref(false);
 
 const userStore = useUserStore();
 const openForMoneda = ref(false);
@@ -178,34 +187,25 @@ const headerMonedas = computed(() => {
 const headerTasas = computed(() => {
   const header = [
     {
-      name: "fecha",
+      name: "fechaValor",
       align: "center",
       label: "Fecha",
       field: "fecha",
       sortable: false,
     },
     {
-      name: "monedaPrinpal",
+      name: "monedaPrincipal",
       align: "center",
       label: "Moneda Principal",
-      field: "moneda",
+      field: "monedaPrincipal",
       sortable: false,
     },
   ];
   const cabezales = [];
-  for (const p of tasasBancarias.value) {
-    const key = Object.keys(p);
-    cabezales.push(...key);
+  for (const p of listMonedas.value) {
+    cabezales.push(p.nombreCorto);
   }
   for (const c of cabezales) {
-    if (
-      c === "_id" ||
-      c === "monedas" ||
-      c === "fecha" ||
-      c === "monedaPrincipal" ||
-      c === "moneda"
-    )
-      continue;
     header.push({
       name: c,
       align: "center",
@@ -226,6 +226,66 @@ onMounted(async () => {
   getListMonedas();
   getTasasBancarias();
 });
+
+const handleSaveFile = async () => {
+  isExcelLoading.value = true;
+  const tasas = [];
+  const monedas = new Set(["Bs"]);
+  try {
+    const workbook = XLSX.read(await excelFile.value.arrayBuffer(), {
+      type: "array",
+    });
+    for (const sheetName of workbook.SheetNames) {
+      const sheet = workbook.Sheets[sheetName];
+      const dataSheet = XLSX.utils.sheet_to_json(sheet, {
+        range: 4,
+        header: "A",
+      });
+      const tasa = { monedaPrincipal: "Bs", Bs: 1 };
+      let DIsNumber = false;
+      let index = 0;
+      for (const row of dataSheet) {
+        if (index === 0) {
+          index++;
+          tasa.fechaOperacion = qDate(
+            row.B.replace("Fecha Operacion: ", ""),
+            "DD/MM/YYYY"
+          ).toDate;
+          tasa.fechaValor = qDate(
+            row.D.replace("Fecha Valor: ", ""),
+            "DD/MM/YYYY"
+          ).toDate;
+          tasa.fechaUpdate = row.D.replace("Fecha Valor: ", "");
+          continue;
+        }
+        index++;
+        if (typeof row.D === "number") {
+          DIsNumber = true;
+          tasa[row.B] = row.G;
+          monedas.add(row.B);
+          continue;
+        }
+        if (DIsNumber) break;
+      }
+      tasas.push(tasa);
+    }
+    const { data } = await Endpoint.monedas({
+      body: { tasas, monedas: [...monedas] },
+      path: "saveTasas",
+    });
+    excelFile.value = null;
+    isExcelLoading.value = false;
+    getListMonedas();
+    getTasasBancarias();
+    alert(data.status);
+  } catch (e) {
+    isExcelLoading.value = false;
+    console.log(e);
+    excelFile.value = null;
+    return;
+  }
+};
+
 const getListMonedas = async () => {
   loaderMonedas.value = true;
   try {
