@@ -6,6 +6,15 @@
     <q-form ref="formRef" class="column q-col-gutter-md" no-error-focus>
       <div class="form-field">
         <q-input
+          label="Nombre corto"
+          color="black"
+          v-model="moneda.nombreCorto"
+          :rules="rules.required"
+          :disable="true"
+        ></q-input>
+      </div>
+      <div class="form-field">
+        <q-input
           label="Nombre"
           color="black"
           v-model="moneda.nombre"
@@ -14,17 +23,9 @@
       </div>
       <div class="form-field">
         <q-input
-          label="Nombre corto"
+          label="Simbolo"
           color="black"
-          v-model="moneda.nombreCorto"
-          :rules="rules.required"
-        ></q-input>
-      </div>
-      <div class="form-field">
-        <q-input
-          label="Nombre interno"
-          color="black"
-          v-model="moneda.nombreInterno"
+          v-model="moneda.simbolo"
           :rules="rules.required"
         ></q-input>
       </div>

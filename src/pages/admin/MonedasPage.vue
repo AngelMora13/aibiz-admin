@@ -49,19 +49,6 @@
                   Editar
                 </q-tooltip>
               </q-btn>
-              <q-btn
-                icon="delete"
-                unelevated
-                @click="openDeleteMonedaData(row)"
-              >
-                <q-tooltip
-                  anchor="top middle"
-                  self="bottom middle"
-                  :offset="[10, 10]"
-                >
-                  Eliminar
-                </q-tooltip>
-              </q-btn>
             </q-td>
           </template>
         </q-table>
@@ -80,6 +67,19 @@
           <template v-slot:body-cell-fechaValor="{ row }">
             <td>
               {{ qDate(row.fechaValor).format("DD-MM-YYYY") }}
+            </td>
+          </template>
+          <template v-slot:body-cell-acciones="{ row }">
+            <td>
+              <q-btn icon="delete" unelevated @click="openDeleteTasa(row)">
+                <q-tooltip
+                  anchor="top middle"
+                  self="bottom middle"
+                  :offset="[10, 10]"
+                >
+                  Eliminar registro
+                </q-tooltip>
+              </q-btn>
             </td>
           </template>
         </q-table>
@@ -105,14 +105,14 @@
       >
         <q-card flat class="w-100">
           <div class="flex justify-center q-pa-md" style="font-size: 14px">
-            <span>¿Está seguro (a) que desea eliminar esta moneda?</span>
+            <span>¿Está seguro (a) que desea eliminar este registro?</span>
           </div>
           <div class="flex justify-center q-pb-md">
             <q-btn
               color="black"
               class="text-white text-capitalize"
               @click="deleteMoneda"
-              :laoding="loaderDelete"
+              :loading="loaderDelete"
               >Aceptar</q-btn
             >
           </div>
@@ -167,10 +167,10 @@ const headerMonedas = computed(() => {
       headerStyle: "white-space: normal",
     },
     {
-      name: "nombreInterno",
+      name: "simbolo",
       align: "center",
-      label: "Nombre interno",
-      field: "nombreInterno",
+      label: "Simbolo",
+      field: "simbolo",
       sortable: false,
       headerStyle: "white-space: normal",
     },
@@ -220,6 +220,13 @@ const headerTasas = computed(() => {
       sortable: false,
     });
   }
+  header.push({
+    name: "acciones",
+    align: "center",
+    label: "acciones",
+    field: "acciones",
+    sortable: false,
+  });
   return header;
 });
 onMounted(async () => {
@@ -304,7 +311,7 @@ const openEditForm = (item) => {
   monedaData.value = item;
   openForMoneda.value = true;
 };
-const openDeleteMonedaData = (item) => {
+const openDeleteTasa = (item) => {
   monedaData.value = item;
   openDeleteMoneda.value = true;
 };
@@ -325,26 +332,22 @@ const handleGuardarMoneda = async ($event) => {
     }
   } catch (e) {
     console.log(e);
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
   } finally {
     openForMoneda.value = false;
   }
 };
 const deleteMoneda = async () => {
   const body = {
-    ...monedaData.value,
+    tasaId: monedaData.value?._id,
   };
   loaderDelete.value = true;
   try {
     const { data } = await Endpoint.monedas({
       body,
-      path: "delete",
+      path: "deleteTasa",
     });
-    const index = listMonedas.value.findIndex(
-      (e) => e._id === monedaData.value._id
-    );
-    if (index !== -1) {
-      listMonedas.value.splice(index, 1);
-    }
+    await getTasasBancarias();
   } catch (e) {
     console.log(e);
   } finally {
@@ -364,7 +367,6 @@ const getTasasBancarias = async () => {
       body,
     });
     tasasBancarias.value = data.tasas || [];
-    console.log(data.tasas);
     paginationTasas.value.rowsNumber = data.cantidad || 0;
   } catch (e) {
     console.log(e);

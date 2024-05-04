@@ -1,32 +1,33 @@
-import { date } from "quasar";
+import moment from "moment-timezone";
 const qDate = (...args) => {
-  const dateClass = class {
-    constructor(fecha, format, timezone = "T04:00:00.000Z") {
-      this.fecha = date.extractDate(fecha, format);
-      if (timezone) {
-        this.fecha = new Date(`${this.format("YYYY-MM-DD")}${timezone}`);
-      }
+  const timeZone = "America/Caracas";
+  const qDate = class {
+    constructor(fecha, format) {
+      this.fecha = moment.tz(fecha, format, timeZone);
+      return this;
     }
     get toDate() {
-      return this.fecha;
+      return this.fecha.toDate();
     }
 
     format(mask) {
-      const fecha = date.formatDate(this.fecha, mask);
-      return fecha;
+      this.fecha = this.fecha.format(mask);
+      return this.fecha;
     }
-
-    subtract(options) {
-      this.fecha = date.subtractFromDate(this.fecha, options);
+    add(...args) {
+      this.fecha = this.fecha.add(...args);
       return this;
     }
-
-    set(options) {
-      this.fecha = date.adjustDate(this.fecha, options);
+    startOf(type) {
+      this.fecha = this.fecha.startOf(type);
+      return this;
+    }
+    endOf(type) {
+      this.fecha = this.fecha.endOf(type);
       return this;
     }
   };
-  return new dateClass(...args);
+  return new qDate(...args);
 };
 
 export { qDate };
