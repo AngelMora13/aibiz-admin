@@ -61,6 +61,16 @@ const routes = [
         name: "monedas",
         component: () => import("src/pages/admin/MonedasPage.vue"),
       },
+      {
+        path: "bancos",
+        name: "bancos",
+        component: () => import("src/pages/admin/BancosPage.vue"),
+      },
+      {
+        path: "iva",
+        name: "iva",
+        component: () => import("src/pages/admin/IvaPage.vue"),
+      },
     ],
   },
 
