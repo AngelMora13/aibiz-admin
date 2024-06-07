@@ -67,9 +67,9 @@ const routes = [
         component: () => import("src/pages/admin/BancosPage.vue"),
       },
       {
-        path: "iva",
-        name: "iva",
-        component: () => import("src/pages/admin/IvaPage.vue"),
+        path: "impuestos",
+        name: "impuestos",
+        component: () => import("src/pages/admin/ImpuestosPage.vue"),
       },
     ],
   },

@@ -32,7 +32,7 @@
             </div>
             <div class="row" style="width: 100%">
               <q-select
-                v-model="filtros.pais"
+                v-model="pais"
                 label="País"
                 title="País"
                 :options="listContryOptions"
@@ -73,6 +73,78 @@
           </template>
         </q-table>
       </div>
+      <div class="row justify-center q-py-md" style="max-width: 100%">
+        <q-table
+          class="col-12"
+          :columns="headerIslr"
+          :rows="islrList"
+          flat
+          no-data-label="no hay datos disponibles"
+          loading-label="Buscando..."
+          rows-per-page-label="filas por pagina"
+          key="_id"
+          row-key="_id"
+          v-model:pagination="paginationIslr"
+          @request="handleTableUpdateIslr"
+          :loading="loaderIslr"
+        >
+          <template v-slot:top>
+            <div class="row" style="width: 100%">
+              <h2 class="col-4 texto-3">Lista de ISLR</h2>
+              <div class="col-8 flex justify-end" style="align-items: center">
+                <q-btn
+                  color="black"
+                  class="text-white text-capitalize"
+                  @click="openFormIslr = true"
+                >
+                  <q-icon name="add" class="q-mr-sm"></q-icon>
+                  Agregar ISLR
+                </q-btn>
+              </div>
+            </div>
+            <div class="row" style="width: 100%">
+              <q-select
+                v-model="paisIslr"
+                label="País"
+                title="País"
+                :options="listContryOptions"
+                option-label="name"
+                option-value="name"
+                emit-value
+                style="min-width: 180px"
+                dense
+                clearable
+                color="black"
+                use-input
+                input-debounce="0"
+                @filter="filterFn"
+              ></q-select>
+            </div>
+          </template>
+          <template v-slot:body-cell-acciones="{ row }">
+            <q-td style="text-align: center">
+              <q-btn icon="edit" unelevated @click="openEditFormIslr(row)">
+                <q-tooltip
+                  anchor="top middle"
+                  self="bottom middle"
+                  :offset="[10, 10]"
+                >
+                  Editar
+                </q-tooltip>
+              </q-btn>
+              <q-btn icon="delete" unelevated @click="openDeleteIslr(row)">
+                <q-tooltip
+                  anchor="top middle"
+                  self="bottom middle"
+                  :offset="[10, 10]"
+                >
+                  Eliminar
+                </q-tooltip>
+              </q-btn>
+            </q-td>
+          </template>
+        </q-table>
+      </div>
       <q-dialog v-model="openFormIva" @keydown.esc="openFormIva = false">
         <q-card flat class="w-100" style="max-width: 400px">
           <div class="row justify-end">
@@ -101,6 +173,41 @@
           </div>
         </q-card>
       </q-dialog>
+      <q-dialog v-model="openFormIslr" @keydown.esc="openFormIslr = false">
+        <q-card flat class="w-100" style="max-width: 400px">
+          <div class="row justify-end">
+            <q-btn
+              unelevated
+              icon="close"
+              @click="openFormIslr = false"
+            ></q-btn>
+          </div>
+          <FormIslr
+            :islrData="islrData"
+            :listContry="listContry"
+            @guardar-islr="saveIslr"
+          ></FormIslr>
+        </q-card>
+      </q-dialog>
+      <q-dialog
+        v-model="openDialogDeleteIslr"
+        @keydown.esc="openDialogDeleteIslr = false"
+      >
+        <q-card flat class="w-100">
+          <div class="flex justify-center q-pa-md" style="font-size: 14px">
+            <span>¿Está seguro (a) que desea eliminar este ISLR?</span>
+          </div>
+          <div class="flex justify-center q-pb-md">
+            <q-btn
+              color="black"
+              class="text-white text-capitalize"
+              @click="deleteIslr"
+              :loading="loaderDelete"
+              >Aceptar</q-btn
+            >
+          </div>
+        </q-card>
+      </q-dialog>
     </div>
   </q-page>
 </template>
@@ -112,26 +219,36 @@ import XLSX from "xlsx";
 import endpoint from "../../services/Endpoint";
 import { useUserStore } from "stores/user-store";
 import FormIva from "src/components/IvaForm.vue";
+import FormIslr from "src/components/FormIslr.vue";
 import Endpoint from "../../services/Endpoint";
 import { debounce } from "quasar";
 
 const userStore = useUserStore();
 const ivaList = ref([]);
+const islrList = ref([]);
 const listContry = ref([]);
 const listContryOptions = ref([]);
 const ivaData = ref(null);
+const islrData = ref(null);
 const openFormIva = ref(false);
+const openFormIslr = ref(false);
 const openDeleteIva = ref(false);
+const openDialogDeleteIslr = ref(false);
 const loaderIva = ref(false);
+const loaderIslr = ref(false);
 const loaderDelete = ref(false);
 const pagination = ref({
   page: 1,
   rowsPerPage: 5,
   rowsNumber: 0,
 });
-const filtros = ref({
-  pais: "",
+const paginationIslr = ref({
+  page: 1,
+  rowsPerPage: 5,
+  rowsNumber: 0,
 });
+const pais = ref(null);
+const paisIslr = ref(null);
 const headersIva = computed(() => {
   const header = [
     {
@@ -159,19 +276,81 @@ const headersIva = computed(() => {
   ];
   return header;
 });
+const headerIslr = computed(() => {
+  const header = [
+    {
+      name: "codigo",
+      align: "left",
+      label: "Código de retención",
+      field: "codigo",
+      sortable: false,
+    },
+    {
+      name: "nombre",
+      align: "left",
+      label: "Nombre",
+      field: "nombre",
+      sortable: false,
+    },
+    {
+      name: "tipo",
+      align: "left",
+      label: "Tipo de retencion",
+      field: "tipoRetencion",
+      sortable: false,
+    },
+    {
+      name: "valorRet",
+      align: "left",
+      label: "Retención (%)",
+      field: "valorRet",
+      sortable: false,
+    },
+    {
+      name: "tipoCalculo",
+      align: "left",
+      label: "Tipo de calculo",
+      field: "tipoCalculo",
+      sortable: false,
+    },
+    {
+      name: "sustraendo",
+      align: "left",
+      label: "Sustraendo",
+      field: "sustraendo",
+      sortable: false,
+    },
+    {
+      name: "minimo",
+      align: "left",
+      label: "Mínimo",
+      field: "minimo",
+      sortable: false,
+    },
+    {
+      name: "acciones",
+      align: "center",
+      label: "Acciones",
+      field: "acciones",
+      sortable: false,
+    },
+  ];
+  return header;
+});
 onMounted(async () => {
   getListContry();
   getListIva();
+  getListIslr();
 });
 const getListIva = async () => {
   try {
     loaderIva.value = true;
     const body = {
-      ...filtros.value,
+      pais: pais.value,
       itemsPorPagina: pagination.value.rowsPerPage,
       pagina: pagination.value.page,
     };
-    const { data } = await Endpoint.iva({
+    const { data } = await Endpoint.impuestos({
       body,
       path: "get",
     });
@@ -194,7 +373,7 @@ const saveIva = async ($event) => {
     const body = {
       ...$event,
     };
-    const { data } = await Endpoint.iva({
+    const { data } = await Endpoint.impuestos({
       body,
       path: "save",
     });
@@ -221,7 +400,7 @@ const deleteIva = async () => {
     const body = {
       _id: ivaData.value._id,
     };
-    const { data } = await Endpoint.iva({
+    const { data } = await Endpoint.impuestos({
       body,
       path: "delete",
     });
@@ -250,7 +429,91 @@ const handleTableUpdate = (props) => {
   const { page, rowsPerPage } = props.pagination;
   pagination.value.page = page;
   pagination.value.rowsPerPage = rowsPerPage;
-  return; //getMovimientos();
+  getListIva();
+  return;
+};
+const handleTableUpdateIslr = (props) => {
+  const { page, rowsPerPage } = props.pagination;
+  paginationIslr.value.page = page;
+  paginationIslr.value.rowsPerPage = rowsPerPage;
+  getListIslr();
+  return;
+};
+const getListIslr = async () => {
+  try {
+    loaderIslr.value = true;
+    const body = {
+      pais: paisIslr.value,
+      itemsPorPagina: paginationIslr.value.rowsPerPage,
+      pagina: paginationIslr.value.page,
+    };
+    const { data } = await Endpoint.impuestos({
+      body,
+      path: "get/islr",
+    });
+    islrList.value = data.islr;
+    paginationIslr.value.rowsNumber = data.countIslr || 0;
+  } catch (e) {
+    console.log(e);
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
+  } finally {
+    loaderIslr.value = false;
+  }
+};
+const openEditFormIslr = (item) => {
+  islrData.value = item;
+  openFormIslr.value = true;
+};
+const saveIslr = async ($event) => {
+  try {
+    const body = {
+      ...$event,
+    };
+    const { data } = await Endpoint.impuestos({
+      body,
+      path: "save/islr",
+    });
+    const index = islrList.value.findIndex((e) => e._id === $event._id);
+    if (index !== -1) {
+      islrList.value.splice(index, 1, data.islr);
+    } else {
+      islrList.value.push(data.islr);
+    }
+  } catch (e) {
+    console.log(e);
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
+  } finally {
+    openFormIslr.value = false;
+  }
+};
+const openDeleteIslr = (item) => {
+  islrData.value = item;
+  openDialogDeleteIslr.value = true;
+};
+const deleteIslr = async () => {
+  loaderDelete.value = true;
+  try {
+    const body = {
+      _id: islrData.value._id,
+    };
+    const { data } = await Endpoint.impuestos({
+      body,
+      path: "delete/islr",
+    });
+    const index1 = islrList.value.findIndex(
+      (e) => e._id === islrData.value._id
+    );
+    if (index1 !== -1) {
+      islrList.value.splice(index1, 1);
+    }
+    alert(data.status);
+  } catch (e) {
+    console.log(e);
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
+  } finally {
+    openDialogDeleteIslr.value = false;
+    loaderDelete.value = false;
+  }
 };
 const filterFn = (val, update) => {
   if (val === "") {
@@ -277,6 +540,15 @@ watch(
   { deep: true }
 );
 watch(
+  () => openDialogDeleteIslr.value,
+  (value) => {
+    if (!value) {
+      islrData.value = null;
+    }
+  },
+  { deep: true }
+);
+watch(
   () => openFormIva.value,
   (value) => {
     if (!value) {
@@ -286,9 +558,24 @@ watch(
   { deep: true }
 );
 watch(
-  filtros.value,
+  () => openFormIslr.value,
+  (value) => {
+    if (!value) {
+      islrData.value = null;
+    }
+  },
+  { deep: true }
+);
+watch(
+  pais,
   debounce((value) => {
     getListIva();
+  }, 500)
+);
+watch(
+  paisIslr,
+  debounce((value) => {
+    getListIslr();
   }, 500)
 );
 </script>

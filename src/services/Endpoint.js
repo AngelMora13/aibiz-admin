@@ -28,8 +28,8 @@ const Endpoint = {
   bancos({ path, body }) {
     return mainServer.post(url + `/v1/bancos/${path}`, body);
   },
-  iva({ path, body }) {
-    return mainServer.post(url + `/v1/iva/${path}`, body);
+  impuestos({ path, body }) {
+    return mainServer.post(url + `/v1/impuestos/${path}`, body);
   },
   getUserByToken({ token }) {
     return mainServer.post(url + "/v1/auth/login", {});
