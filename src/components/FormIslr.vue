@@ -30,7 +30,22 @@
           v-model="islr.valorRet"
           dense
           inputmode="numeric"
-          label="Retención"
+          label="Retención (%)"
+          color="black"
+          :rules="rules.required"
+          mask="#"
+          reverse-fill-mask
+          :min="1"
+          :max="99"
+        >
+        </q-input>
+      </div>
+      <div class="form-field">
+        <q-input
+          v-model="islr.valorBaseImponible"
+          dense
+          inputmode="numeric"
+          label="Base imponible (%)"
           color="black"
           :rules="rules.required"
           mask="#"
@@ -145,6 +160,7 @@ const islr = ref({
   sustraendo: 0,
   minimo: 0,
   pais: "",
+  valorBaseImponible: 0,
 });
 const listContryOptions = ref([]);
 onMounted(() => {

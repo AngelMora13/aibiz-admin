@@ -470,6 +470,13 @@ const headerIslr = computed(() => {
       sortable: false,
     },
     {
+      name: "valorBaseImponible",
+      align: "left",
+      label: "Base imponible (%)",
+      field: "valorBaseImponible",
+      sortable: false,
+    },
+    {
       name: "tipoCalculo",
       align: "left",
       label: "Tipo de calculo",
