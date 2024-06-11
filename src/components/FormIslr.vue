@@ -14,13 +14,16 @@
         />
       </div>
       <div class="form-field">
-        <q-input
-          v-model="islr.tipoRetencion"
+        <q-select
+          class="w-100"
           dense
-          label="Tipo de retencion"
           color="black"
+          label="Tipo de retencion"
+          v-model="islr.tipoRetencion"
+          :options="tiposRIslr"
           :rules="rules.required"
-        />
+        >
+        </q-select>
       </div>
       <div class="form-field">
         <q-input
@@ -124,6 +127,12 @@ const props = defineProps({
 const rules = {
   required: [(v) => !!v || "Campo obligatorio"],
 };
+const tiposRIslr = [
+  "Persona natural residente",
+  "Persona natural no residente",
+  "Persona juridica domiciliada",
+  "Persona juridica no domiciliada",
+];
 const isFormValid = ref(false);
 const isLoading = ref(false);
 const formRef = ref(null);
