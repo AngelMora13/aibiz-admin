@@ -16,6 +16,7 @@
         <q-input
           v-model="iva.iva"
           dense
+          :disable="iva.isExento || iva.isExonerado || iva.isNoSujeto"
           inputmode="numeric"
           label="I.V.A (%)"
           color="black"
@@ -26,6 +27,46 @@
           :max="99"
         >
         </q-input>
+      </div>
+      <div class="form-field">
+        <q-checkbox
+          v-model="iva.isExento"
+          label="Exento"
+          color="secondary"
+          @update:model-value="updateValueIva($event, 'isExento')"
+        />
+        <q-checkbox
+          v-model="iva.isExonerado"
+          label="Exonerado"
+          color="secondary"
+          @update:model-value="updateValueIva($event, 'isExonerado')"
+        />
+        <q-checkbox
+          v-model="iva.isNoSujeto"
+          label="No sujeto"
+          color="secondary"
+          @update:model-value="updateValueIva($event, 'isNoSujeto')"
+        />
+        <q-checkbox
+          v-model="iva.SinDeretoCredito"
+          label="Sin derecho a crédito fiscal"
+          color="secondary"
+          @update:model-value="updateValueIva($event, 'SinDeretoCredito')"
+        />
+      </div>
+      <div class="form-field">
+        <q-input
+          label="Nombre corto"
+          color="black"
+          v-model="iva.nombreCorto"
+          :rules="rules.required"
+          v-if="
+            iva.SinDeretoCredito ||
+            iva.isExento ||
+            iva.isExonerado ||
+            iva.isNoSujeto
+          "
+        ></q-input>
       </div>
       <div class="form-field">
         <q-select
@@ -81,6 +122,11 @@ const iva = ref({
   nombre: "",
   iva: "",
   pais: "",
+  isExento: false,
+  isExonerado: false,
+  isNoSujeto: false,
+  SinDeretoCredito: false,
+  nombreCorto: "",
 });
 const listContryOptions = ref([]);
 onMounted(() => {
@@ -108,6 +154,32 @@ const filterFn = (val, update) => {
       (v) => v.name.toLowerCase().indexOf(needle) > -1
     );
   });
+};
+const updateValueIva = (value, type) => {
+  if (!value) iva.value.nombreCorto = "";
+  if (value && type === "isExento") {
+    iva.value.iva = 0;
+    iva.value.isExonerado = false;
+    iva.value.isNoSujeto = false;
+    iva.value.SinDeretoCredito = false;
+  }
+  if (value && type === "isExonerado") {
+    iva.value.iva = 0;
+    iva.value.isExento = false;
+    iva.value.isNoSujeto = false;
+    iva.value.SinDeretoCredito = false;
+  }
+  if (value && type === "isNoSujeto") {
+    iva.value.iva = 0;
+    iva.value.isExonerado = false;
+    iva.value.isExento = false;
+    iva.value.SinDeretoCredito = false;
+  }
+  if (value && type === "SinDeretoCredito") {
+    iva.value.isExonerado = false;
+    iva.value.isNoSujeto = false;
+    iva.value.isExento = false;
+  }
 };
 watch(
   () => iva.value,
