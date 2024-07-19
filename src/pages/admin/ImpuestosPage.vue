@@ -217,6 +217,96 @@
           </template>
         </q-table>
       </div>
+      <div class="row justify-center q-py-md" style="max-width: 100%">
+        <q-table
+          class="col-12"
+          :columns="headeCiclos"
+          :rows="ciclosList"
+          flat
+          no-data-label="no hay datos disponibles"
+          loading-label="Buscando..."
+          rows-per-page-label="filas por pagina"
+          key="_id"
+          row-key="_id"
+          v-model:pagination="paginationCiclos"
+          @request="handleTableUpdateCiclo"
+          :loading="loaderCiclo"
+        >
+          <template v-slot:top>
+            <div class="row" style="width: 100%">
+              <h2 class="col-4 texto-3">Ciclos de impuestos</h2>
+              <div class="col-8 flex justify-end" style="align-items: center">
+                <q-btn
+                  color="black"
+                  class="text-white text-capitalize"
+                  @click="openCicloImpuesto = true"
+                >
+                  <q-icon name="add" class="q-mr-sm"></q-icon>
+                  Agregar ciclo
+                </q-btn>
+              </div>
+            </div>
+            <div class="row" style="width: 100%">
+              <q-select
+                v-model="paisCiclos"
+                label="País"
+                title="País"
+                :options="listContryOptions"
+                option-label="name"
+                option-value="name"
+                emit-value
+                style="min-width: 180px"
+                dense
+                clearable
+                color="black"
+                use-input
+                input-debounce="0"
+                @filter="filterFn"
+              ></q-select>
+            </div>
+          </template>
+          <template v-slot:body-cell-fechaInicio="{ row }">
+            <q-td style="text-align: center">
+              {{ qDate(row.fechaInicio).format("DD/MM/YYYY") }}
+            </q-td>
+          </template>
+          <template v-slot:body-cell-fechaFin="{ row }">
+            <q-td style="text-align: center">
+              {{
+                row.isFechaActual
+                  ? "Actual"
+                  : qDate(row.fechaFin).format("DD/MM/YYYY")
+              }}
+            </q-td>
+          </template>
+          <template v-slot:body-cell-acciones="{ row }">
+            <q-td style="text-align: center">
+              <q-btn icon="edit" unelevated @click="openEditForCiclo(row)">
+                <q-tooltip
+                  anchor="top middle"
+                  self="bottom middle"
+                  :offset="[10, 10]"
+                >
+                  Editar
+                </q-tooltip>
+              </q-btn>
+              <q-btn
+                icon="delete"
+                unelevated
+                @click="openDialogDeleteCiclo(row)"
+              >
+                <q-tooltip
+                  anchor="top middle"
+                  self="bottom middle"
+                  :offset="[10, 10]"
+                >
+                  Eliminar
+                </q-tooltip>
+              </q-btn>
+            </q-td>
+          </template>
+        </q-table>
+      </div>
       <q-dialog v-model="openFormIva" @keydown.esc="openFormIva = false">
         <q-card flat class="w-100" style="max-width: 400px">
           <div class="row justify-end">
@@ -318,6 +408,44 @@
           </div>
         </q-card>
       </q-dialog>
+      <q-dialog
+        v-model="openCicloImpuesto"
+        @keydown.esc="openCicloImpuesto = false"
+      >
+        <q-card flat class="w-100" style="max-width: 400px">
+          <div class="row justify-end">
+            <q-btn
+              unelevated
+              icon="close"
+              @click="openCicloImpuesto = false"
+            ></q-btn>
+          </div>
+          <cicloImpuesto
+            :itemCiclo="itemCiclo"
+            :listContry="listContry"
+            @guardar-ciclo="saveCiclo"
+          ></cicloImpuesto>
+        </q-card>
+      </q-dialog>
+      <q-dialog
+        v-model="openDeleteCiclo"
+        @keydown.esc="openDeleteCiclo = false"
+      >
+        <q-card flat class="w-100">
+          <div class="flex justify-center q-pa-md" style="font-size: 14px">
+            <span>¿Está seguro (a) que desea eliminar este ciclo?</span>
+          </div>
+          <div class="flex justify-center q-pb-md">
+            <q-btn
+              color="black"
+              class="text-white text-capitalize"
+              @click="deleteCiclo"
+              :loading="loaderDelete"
+              >Aceptar</q-btn
+            >
+          </div>
+        </q-card>
+      </q-dialog>
     </div>
   </q-page>
 </template>
@@ -331,6 +459,7 @@ import { useUserStore } from "stores/user-store";
 import FormIva from "src/components/IvaForm.vue";
 import formRetIva from "src/components/formRetIva.vue";
 import FormIslr from "src/components/FormIslr.vue";
+import cicloImpuesto from "src/components/formCiclosImpuestos.vue";
 import Endpoint from "../../services/Endpoint";
 import { debounce } from "quasar";
 
@@ -338,21 +467,26 @@ const userStore = useUserStore();
 const ivaList = ref([]);
 const islrList = ref([]);
 const retIvaList = ref([]);
+const ciclosList = ref([]);
 const listContry = ref([]);
 const listContryOptions = ref([]);
 const ivaData = ref(null);
 const islrData = ref(null);
 const retIvaData = ref(null);
+const itemCiclo = ref(null);
 const openFormIva = ref(false);
 const openFormIslr = ref(false);
 const openDeleteIva = ref(false);
 const openDialogDeleteIslr = ref(false);
 const openFormRetIva = ref(false);
 const openDeleteRetIva = ref(false);
+const openCicloImpuesto = ref(false);
+const openDeleteCiclo = ref(false);
 const loaderIva = ref(false);
 const loaderIslr = ref(false);
 const loaderRetIva = ref(false);
 const loaderDelete = ref(false);
+const loaderCiclo = ref(false);
 const pagination = ref({
   page: 1,
   rowsPerPage: 5,
@@ -368,9 +502,15 @@ const paginationRetIva = ref({
   rowsPerPage: 5,
   rowsNumber: 0,
 });
+const paginationCiclos = ref({
+  page: 1,
+  rowsPerPage: 5,
+  rowsNumber: 0,
+});
 const pais = ref(null);
 const paisIslr = ref(null);
 const paisRetencionIva = ref(null);
+const paisCiclos = ref(null);
 const headersIva = computed(() => {
   const header = [
     {
@@ -507,11 +647,52 @@ const headerIslr = computed(() => {
   ];
   return header;
 });
+const headeCiclos = computed(() => {
+  const header = [
+    {
+      name: "descripcion",
+      align: "left",
+      label: "Descripción",
+      field: "descripcion",
+      sortable: false,
+    },
+    {
+      name: "fechaInicio",
+      align: "left",
+      label: "Fecha de inicio",
+      field: "fechaInicio",
+      sortable: false,
+    },
+    {
+      name: "fechaFin",
+      align: "left",
+      label: "Fecha fin",
+      field: "fechaFin",
+      sortable: false,
+    },
+    {
+      name: "tipoCiclo",
+      align: "left",
+      label: "Tipo",
+      field: "tipoCiclo",
+      sortable: false,
+    },
+    {
+      name: "acciones",
+      align: "center",
+      label: "Acciones",
+      field: "acciones",
+      sortable: false,
+    },
+  ];
+  return header;
+});
 onMounted(async () => {
   getListContry();
   getListIva();
   getListIslr();
   getListRetIva();
+  getCiclos();
 });
 const getListIva = async () => {
   try {
@@ -607,6 +788,13 @@ const handleTableUpdateIslr = (props) => {
   const { page, rowsPerPage } = props.pagination;
   paginationIslr.value.page = page;
   paginationIslr.value.rowsPerPage = rowsPerPage;
+  getListIslr();
+  return;
+};
+const handleTableUpdateCiclo = (props) => {
+  const { page, rowsPerPage } = props.pagination;
+  paginationCiclos.value.page = page;
+  paginationCiclos.value.rowsPerPage = rowsPerPage;
   getListIslr();
   return;
 };
@@ -763,6 +951,92 @@ const deleteRetIva = async () => {
     loaderDelete.value = false;
   }
 };
+const getCiclos = async () => {
+  try {
+    loaderCiclo.value = true;
+    const body = {
+      pais: paisCiclos.value,
+      itemsPorPagina: paginationCiclos.value.rowsPerPage,
+      pagina: paginationCiclos.value.page,
+    };
+    const { data } = await Endpoint.impuestos({
+      body,
+      path: "get/ciclosImpuestos",
+    });
+    console.log({ data });
+    ciclosList.value = data.ciclos;
+    paginationCiclos.value.rowsNumber = data.count || 0;
+  } catch (e) {
+    console.log(e);
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
+  } finally {
+    loaderCiclo.value = false;
+  }
+};
+const saveCiclo = async ($event) => {
+  try {
+    const body = {
+      ...$event,
+      fechaInicio: qDate($event.fechaInicio, "DD/MM/YYYY").toDate,
+      fechaFin: $event.fechaFin
+        ? qDate($event.fechaFin, "DD/MM/YYYY").toDate
+        : null,
+    };
+    console.log(1);
+    const { data } = await Endpoint.impuestos({
+      body,
+      path: "save/cicloImpusto",
+    });
+    console.log(2);
+    const index = ciclosList.value?.findIndex((e) => e._id === $event._id);
+    console.log(3);
+    if (index !== -1) {
+      ciclosList.value.splice(index, 1, data.ciclo);
+    } else {
+      ciclosList.value.push(data.ciclo);
+    }
+
+    console.log(4);
+  } catch (e) {
+    console.log(e);
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
+  } finally {
+    openCicloImpuesto.value = false;
+  }
+};
+const openEditForCiclo = (item) => {
+  itemCiclo.value = item;
+  openCicloImpuesto.value = true;
+};
+const openDialogDeleteCiclo = (item) => {
+  itemCiclo.value = item;
+  openDeleteCiclo.value = true;
+};
+const deleteCiclo = async () => {
+  loaderDelete.value = true;
+  try {
+    const body = {
+      _id: itemCiclo.value._id,
+    };
+    const { data } = await Endpoint.impuestos({
+      body,
+      path: "delete/cicloImpusto",
+    });
+    const index1 = ciclosList.value.findIndex(
+      (e) => e._id === itemCiclo.value._id
+    );
+    if (index1 !== -1) {
+      ciclosList.value.splice(index1, 1);
+    }
+    alert(data.status);
+  } catch (e) {
+    console.log(e);
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
+  } finally {
+    openDeleteCiclo.value = false;
+    loaderDelete.value = false;
+  }
+};
 const filterFn = (val, update) => {
   if (val === "") {
     update(() => {
@@ -828,6 +1102,15 @@ watch(
   (value) => {
     if (!value) {
       islrData.value = null;
+    }
+  },
+  { deep: true }
+);
+watch(
+  () => openCicloImpuesto.value,
+  (value) => {
+    if (!value) {
+      itemCiclo.value = null;
     }
   },
   { deep: true }
