@@ -678,6 +678,13 @@ const headeCiclos = computed(() => {
       sortable: false,
     },
     {
+      name: "tipo",
+      align: "left",
+      label: "Tipo de impuesto",
+      field: "tipoImpuesto",
+      sortable: false,
+    },
+    {
       name: "acciones",
       align: "center",
       label: "Acciones",

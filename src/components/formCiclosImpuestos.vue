@@ -112,6 +112,17 @@
       </div>
       <div class="form-field">
         <q-select
+          label="Tipo de ciclo"
+          color="black"
+          v-model="ciclo.tipoImpuesto"
+          :options="tiposimpuestos"
+          use-input
+          input-debounce="0"
+          :rules="rules.required"
+        ></q-select>
+      </div>
+      <div class="form-field">
+        <q-select
           label="País"
           color="black"
           v-model="ciclo.pais"
@@ -144,12 +155,13 @@ import { ref, onMounted, computed, watch, defineProps, defineEmits } from "vue";
 import { useUserStore } from "stores/user-store";
 import endpoint from "../services/Endpoint";
 import { date, debounce } from "quasar";
+import { qDate } from "src/utils/qDate";
 const userStore = useUserStore();
 const emit = defineEmits(["guardar-ciclo"]);
 const props = defineProps({
   itemCiclo: {
     default: null,
-    type: Object || null,
+    type: Object,
   },
   listContry: {
     type: Array,
@@ -170,14 +182,22 @@ const ciclo = ref({
   fechaFin: "",
   isFechaActual: false,
   tipoCiclo: "",
+  tipoImpuesto: "",
   pais: "",
 });
 const tiposCiclos = ["Mensual", "Quincenal", "Semanal"];
+const tiposimpuestos = ["IVA", "RET ISLR", "RET IVA"];
 const listContryOptions = ref([]);
 onMounted(() => {
   //listContryOptions.value = props.listContry;
   if (props.itemCiclo) {
     ciclo.value = { ...props.itemCiclo };
+    ciclo.value.fechaInicio = qDate(props.itemCiclo.fechaInicio).format(
+      "DD/MM/YYYY"
+    );
+    ciclo.value.fechaFin = props.itemCiclo.fechaFin
+      ? qDate(props.itemCiclo.fechaFin).format("DD/MM/YYYY")
+      : "";
   }
 });
 const maskInput2 = computed(() => {

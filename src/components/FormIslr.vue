@@ -71,7 +71,7 @@
           color="black"
           label="Tipo de calculo"
           v-model="islr.tipoCalculo"
-          :options="['Bs.', '%', 'UT']"
+          :options="['Bs', '%', 'UT']"
           :rules="rules.required"
         >
         </q-select>
