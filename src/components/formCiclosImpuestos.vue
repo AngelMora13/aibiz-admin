@@ -112,7 +112,7 @@
       </div>
       <div class="form-field">
         <q-select
-          label="Tipo de ciclo"
+          label="Tipo de impuestos"
           color="black"
           v-model="ciclo.tipoImpuesto"
           :options="tiposimpuestos"
@@ -120,6 +120,13 @@
           input-debounce="0"
           :rules="rules.required"
         ></q-select>
+      </div>
+      <div class="form-field">
+        <q-checkbox
+          v-model="ciclo.isSujetoPasivoEspecial"
+          label="Es sujeto pasivo especial"
+          color="secondary"
+        />
       </div>
       <div class="form-field">
         <q-select
@@ -184,6 +191,7 @@ const ciclo = ref({
   tipoCiclo: "",
   tipoImpuesto: "",
   pais: "",
+  isSujetoPasivoEspecial: false,
 });
 const tiposCiclos = ["Mensual", "Quincenal", "Semanal"];
 const tiposimpuestos = ["IVA", "RET ISLR", "RET IVA"];
