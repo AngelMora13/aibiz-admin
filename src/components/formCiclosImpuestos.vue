@@ -162,7 +162,7 @@ import { ref, onMounted, computed, watch, defineProps, defineEmits } from "vue";
 import { useUserStore } from "stores/user-store";
 import endpoint from "../services/Endpoint";
 import { date, debounce } from "quasar";
-import { qDate } from "src/utils/qDate";
+import { momentDate } from "src/utils/qDate";
 const userStore = useUserStore();
 const emit = defineEmits(["guardar-ciclo"]);
 const props = defineProps({
@@ -200,11 +200,11 @@ onMounted(() => {
   //listContryOptions.value = props.listContry;
   if (props.itemCiclo) {
     ciclo.value = { ...props.itemCiclo };
-    ciclo.value.fechaInicio = qDate(props.itemCiclo.fechaInicio).format(
+    ciclo.value.fechaInicio = momentDate(props.itemCiclo.fechaInicio).format(
       "DD/MM/YYYY"
     );
     ciclo.value.fechaFin = props.itemCiclo.fechaFin
-      ? qDate(props.itemCiclo.fechaFin).format("DD/MM/YYYY")
+      ? momentDate(props.itemCiclo.fechaFin).format("DD/MM/YYYY")
       : "";
   }
 });
