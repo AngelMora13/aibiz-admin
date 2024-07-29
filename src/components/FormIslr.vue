@@ -76,6 +76,15 @@
         >
         </q-select>
       </div>
+      <div class="form-field" v-if="islr.tipoCalculo === 'UT'">
+        <CurrencyField
+          v-model:value="islr.valorUT"
+          label="Valor UT"
+          class="col-6"
+          :rules="rules.required"
+          :value="islr.valorUT"
+        ></CurrencyField>
+      </div>
       <div class="form-field">
         <CurrencyField
           v-model:value="islr.sustraendo"
@@ -161,6 +170,7 @@ const islr = ref({
   minimo: 0,
   pais: "",
   valorBaseImponible: 0,
+  valorUT: 0,
 });
 const listContryOptions = ref([]);
 onMounted(() => {
