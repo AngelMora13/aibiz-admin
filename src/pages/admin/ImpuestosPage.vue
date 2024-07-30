@@ -1027,7 +1027,7 @@ const deleteCiclo = async () => {
     };
     const { data } = await Endpoint.impuestos({
       body,
-      path: "delete/cicloImpusto",
+      path: "delete/ciclosImpuestos",
     });
     const index1 = ciclosList.value.findIndex(
       (e) => e._id === itemCiclo.value._id
