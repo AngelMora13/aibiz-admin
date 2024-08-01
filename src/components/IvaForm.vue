@@ -35,7 +35,6 @@
           dense
           color="black"
           label="Tipo"
-          :rules="rules.required"
         >
         </q-select>
       </div>
