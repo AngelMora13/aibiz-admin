@@ -31,7 +31,7 @@
       <div class="form-field">
         <q-select
           v-model="iva.tipo"
-          :options="['General', 'General+Adicional', 'Reducidad']"
+          :options="['General', 'General+Adicional', 'Reducida']"
           dense
           color="black"
           label="Tipo"
