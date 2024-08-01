@@ -29,6 +29,17 @@
         </q-input>
       </div>
       <div class="form-field">
+        <q-select
+          v-model="iva.tipo"
+          :options="['General', 'General+Adicional', 'Reducidad']"
+          dense
+          color="black"
+          label="Tipo"
+          :rules="rules.required"
+        >
+        </q-select>
+      </div>
+      <div class="form-field">
         <q-checkbox
           v-model="iva.isExento"
           label="Exento"
@@ -127,6 +138,7 @@ const iva = ref({
   isNoSujeto: false,
   SinDeretoCredito: false,
   nombreCorto: "",
+  tipo: "",
 });
 const listContryOptions = ref([]);
 onMounted(() => {
