@@ -25,6 +25,12 @@ const Endpoint = {
   monedas({ path, body }) {
     return mainServer.post(url + `/v1/monedas/${path}`, body);
   },
+  bancos({ path, body }) {
+    return mainServer.post(url + `/v1/bancos/${path}`, body);
+  },
+  impuestos({ path, body }) {
+    return mainServer.post(url + `/v1/impuestos/${path}`, body);
+  },
   getUserByToken({ token }) {
     return mainServer.post(url + "/v1/auth/login", {});
   },
@@ -72,6 +78,9 @@ const Endpoint = {
     return mainServer.post(url + "/v1/sub-dominios/deleteMany", {
       empresaData,
     });
+  },
+  getStateByCode() {
+    return axios.get("https://countriesnow.space/api/v0.1/countries/states");
   },
 };
 

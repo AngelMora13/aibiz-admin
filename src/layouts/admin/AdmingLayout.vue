@@ -81,6 +81,24 @@
             <q-item-section class="titulo-color"> Monedas </q-item-section>
           </q-item>
           <q-separator color="secondary" class="q-mt-sm q-mb-xl" size="2px" />
+          <q-item :to="{ name: 'bancos' }" exact exact-active-class="selected">
+            <q-item-section avatar>
+              <q-icon name="paid" />
+            </q-item-section>
+            <q-item-section class="titulo-color"> Bancos </q-item-section>
+          </q-item>
+          <q-separator color="secondary" class="q-mt-sm q-mb-xl" size="2px" />
+          <q-item
+            :to="{ name: 'impuestos' }"
+            exact
+            exact-active-class="selected"
+          >
+            <q-item-section avatar>
+              <q-icon name="paid" />
+            </q-item-section>
+            <q-item-section class="titulo-color"> Impuestos </q-item-section>
+          </q-item>
+          <q-separator color="secondary" class="q-mt-sm q-mb-xl" size="2px" />
         </q-list>
       </q-scroll-area>
     </q-drawer>
