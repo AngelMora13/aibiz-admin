@@ -22,6 +22,15 @@
                   color="black"
                   class="text-white text-capitalize"
                   :loading="isExcelLoading"
+                  @click="probando"
+                >
+                  <q-icon name="cloud_upload" class="q-mr-sm"></q-icon>
+                  Prueba de scraping
+                </q-btn>
+                <q-btn
+                  color="black"
+                  class="text-white text-capitalize"
+                  :loading="isExcelLoading"
                   @click="excelInput && excelInput.pickFiles()"
                 >
                   <q-icon name="cloud_upload" class="q-mr-sm"></q-icon>
@@ -233,7 +242,18 @@ onMounted(async () => {
   getListMonedas();
   getTasasBancarias();
 });
-
+const probando = async () => {
+  try {
+    const { data } = await Endpoint.monedas({
+      body: {},
+      path: "pruebaScraping",
+    });
+    console.log({ data });
+  } catch (e) {
+    console.log(e);
+  } finally {
+  }
+};
 const handleSaveFile = async () => {
   isExcelLoading.value = true;
   const tasas = [];

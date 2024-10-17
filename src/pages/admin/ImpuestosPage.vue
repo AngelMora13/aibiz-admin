@@ -817,6 +817,7 @@ const getListIslr = async () => {
       body,
       path: "get/islr",
     });
+    console.log({ data });
     islrList.value = data.islr;
     paginationIslr.value.rowsNumber = data.countIslr || 0;
   } catch (e) {
