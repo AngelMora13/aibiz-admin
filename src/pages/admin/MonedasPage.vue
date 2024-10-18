@@ -17,7 +17,10 @@
           <template v-slot:top>
             <div class="row" style="width: 100%">
               <h2 class="col-4 texto-3">Lista de monedas</h2>
-              <div class="col-8 flex justify-end" style="align-items: center">
+              <div
+                class="col-8 flex justify-end gap-2"
+                style="align-items: center"
+              >
                 <q-btn
                   color="black"
                   class="text-white text-capitalize"
@@ -25,7 +28,7 @@
                   @click="probando"
                 >
                   <q-icon name="cloud_upload" class="q-mr-sm"></q-icon>
-                  Prueba de scraping
+                  Actualizar Tasas Bancarias
                 </q-btn>
                 <q-btn
                   color="black"
@@ -221,7 +224,7 @@ const headerTasas = computed(() => {
       label: c,
       field: c,
       format: (val, row) =>
-        Number(val).toLocaleString("de-DE", {
+        Number(val || 0).toLocaleString("de-DE", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }),
