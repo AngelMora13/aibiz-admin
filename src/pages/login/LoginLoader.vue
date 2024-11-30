@@ -15,7 +15,7 @@ import { useUserStore } from "stores/user-store";
 const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
-let routerToAfterLogin = "";
+let routerToAfterLogin = "/administracion";
 onMounted(() => {
   const query = route.query;
   if (query.to) routerToAfterLogin = decodeURIComponent(query.to);
@@ -32,7 +32,7 @@ watch(
   () => userStore.isLogin,
   (value) => {
     if (routerToAfterLogin && value) return router.push(routerToAfterLogin);
-    router.push({ name: "home" });
+    router.push({ name: "administracion" });
   }
 );
 watch(
