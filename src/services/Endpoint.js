@@ -68,6 +68,11 @@ const Endpoint = {
       empresaData,
     });
   },
+  deleteEmpresa(empresaData) {
+    return mainServer.post(url + "/v1/sub-dominios/delete", {
+      empresaData,
+    });
+  },
   disabledEmpresa(empresaData) {
     return mainServer.post(
       url + "/v1/sub-dominios/disabled/" + empresaData._id,

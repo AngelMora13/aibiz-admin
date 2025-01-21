@@ -84,6 +84,7 @@
           :formType="formType"
           @desactivar="disabledEmpresa"
           @submit="handleSubmit"
+          @delete="deleteEmpresa"
         ></EmpresaForm>
       </div>
     </q-dialog>
@@ -283,6 +284,19 @@ const disabledMany = async () => {
 const openAlertDelete = () => {
   accionAlert.value = "eliminar";
   openAlertDisableDelete.value = true;
+};
+const deleteEmpresa = async () => {
+  console.log("delete", empresaFormData.value);
+  try {
+    const { data } = await endpoint.deleteEmpresa(empresaFormData.value);
+    empresaFormData.value = empresaFormDataDefault.value;
+    console.log(data);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    openFormEmpresa.value = false;
+    getSubDominios();
+  }
 };
 const deleteMany = async () => {
   console.log("delete");

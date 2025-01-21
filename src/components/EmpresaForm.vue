@@ -127,7 +127,9 @@
         class="flex-responsive justify-between q-mt-lg"
         v-if="formType === 'editar'"
       >
-        <q-btn flat color="#C4C4C4" class="color-disabled"> Eliminar </q-btn>
+        <q-btn flat color="negative" @click="openAlerDelete = true">
+          Eliminar
+        </q-btn>
         <div class="flex-responsive">
           <q-btn
             outline
@@ -164,6 +166,52 @@
         </q-btn>
       </div>
     </q-dialog>
+    <q-dialog v-model="openAlerDelete">
+      <div class="alert-container">
+        <span> ¿Está seguro(a) que desea eliminaresta empresa? </span>
+        <q-btn
+          color="negative text-capitalize"
+          class="q-mb-md"
+          @click="openDialogConfirmDelete = true"
+        >
+          Eliminar
+        </q-btn>
+      </div>
+    </q-dialog>
+    <q-dialog v-model="openDialogConfirmDelete">
+      <q-card>
+        <div class="row justify-center" style="font-size: 16px; padding: 16px">
+          <p>¿Está seguro(a) que desea eliminaresta empresa?</p>
+          <span style="font-size: 14px; color: red">
+            '* Se perderá toda la informacion que tenga la empresa'
+          </span>
+          <div class="column">
+            <span style="font-size: 12px"
+              >Para eliminar la empresa escriba
+              <strong>{{ empresaData.subDominio }}</strong></span
+            >
+            <q-input
+              outlined
+              dense
+              v-model="textConfirm"
+              borderless
+              color="#000"
+            ></q-input>
+          </div>
+        </div>
+        <div class="row justify-center text-h6">
+          <q-btn
+            unelevated
+            label="Aceptar"
+            color="red"
+            class="q-mb-sm"
+            :loading="loaderDelete"
+            @click="deleteSubDominio"
+            :disable="textConfirm !== empresaData.subDominio"
+          ></q-btn>
+        </div>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 <script setup>
@@ -180,12 +228,16 @@ const props = defineProps({
     type: String,
   },
 });
-const emit = defineEmits(["update:empresa", "desactivar", "submit"]);
+const emit = defineEmits(["update:empresa", "desactivar", "submit", "delete"]);
 const userStore = useUserStore();
 const empresaForm = ref(null);
 const typesDocument = ["J", "V"];
 const listOfModules = ref([]);
 const openAlertDisabled = ref(false);
+const openAlerDelete = ref(false);
+const openDialogConfirmDelete = ref(false);
+const loaderDelete = ref(false);
+const textConfirm = ref("");
 /*
 const empresaData = ref({
   razonSocial: "",
@@ -253,6 +305,10 @@ const crearSubDominio = async () => {
   } catch (e) {
     console.log(e);
   }
+};
+const deleteSubDominio = () => {
+  loaderDelete.value = true;
+  emit("delete");
 };
 watch(
   () => empresaData,
