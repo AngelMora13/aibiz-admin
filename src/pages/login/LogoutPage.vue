@@ -16,7 +16,7 @@ const router = useRouter();
 onMounted(() => {
   if (userStore.isLogin) userStore.logOut();
   setTimeout(() => {
-    router.push({ name: "home" });
+    router.push({ name: "login" });
   }, 1500);
 });
 </script>

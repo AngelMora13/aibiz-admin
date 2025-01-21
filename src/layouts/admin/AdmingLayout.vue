@@ -1,24 +1,34 @@
 <template>
-  <q-layout view="lHh lpr lFf">
-    <q-header class="q-pa-md text-white sombra-1">
+  <q-layout view="hHh Lpr lff">
+    <q-header :elevated="false" class="text-white bg-dark" bordered>
       <q-toolbar class="row justify-between">
-        <div class="row justify-between w-100" style="gap: 40px">
+        <div class="row">
           <q-btn
-            @click="miniDrawerStateController = !miniDrawerStateController"
+            v-if="!isDesktop"
             flat
-            round
             dense
+            round
             icon="menu"
-            size="lg"
-            class="q-mr-sm"
+            aria-label="Menu"
+            @click="miniDrawerStateController = !miniDrawerStateController"
           />
+          <q-toolbar-title v-if="Screen.gt.sm">
+            <router-link to="/administracion">
+              <q-img
+                src="~assets/logo.svg"
+                alt="aibiz"
+                fit="contain"
+                width="100px"
+              ></q-img>
+            </router-link>
+          </q-toolbar-title>
         </div>
         <div class="navigation text-weight-bold">
           <div class="navigation-user">
             <UserLogout
               avatar-color="white"
-              text-color="primary"
-              view-path="/"
+              text-color="black"
+              view-path="/administracion"
               view-label="Ir al home"
             ></UserLogout>
           </div>
@@ -30,77 +40,53 @@
       :mini="miniDrawerState"
       show-if-above
       :width="250"
-      :mini-width="80"
-      :breakpoint="600"
-      :overlay="!isDesktop"
-      @click="miniDrawerStateController = false"
+      :mini-width="60"
+      bordered
+      :behavior="isDesktop ? 'desktop' : 'mobile'"
+      class="text-white bg-dark"
+      @click="isDesktop ? (miniDrawerStateController = false) : undefined"
     >
-      <q-scroll-area class="fit">
-        <q-list class="q-pa-sm">
-          <q-item clickable>
-            <q-item-section avatar>
-              <router-link
-                class="square titulo-4"
-                :class="{ mini: miniDrawerState, 'texto-3': miniDrawerState }"
-                :to="{ name: 'administracion' }"
-              >
-                Aibiz
-              </router-link>
-            </q-item-section>
-          </q-item>
-          <q-separator class="q-my-sm" v-show="!miniDrawerState" />
-        </q-list>
-        <q-list class="list-links text-primary text-weight-bold q-pa-sm">
-          <q-item
-            clickable
-            :to="{ name: 'empresas' }"
-            exact
-            exact-active-class="selected"
-          >
-            <q-item-section avatar>
-              <q-icon name="apartment" />
-            </q-item-section>
-            <q-item-section class="titulo-color"> Empresas </q-item-section>
-          </q-item>
-          <q-separator color="secondary" class="q-mt-sm q-mb-xl" size="2px" />
-          <q-item
-            :to="{ name: 'usuarios' }"
-            exact
-            exact-active-class="selected"
-          >
-            <q-item-section avatar>
-              <q-icon name="person" />
-            </q-item-section>
-            <q-item-section class="titulo-color"> Usuarios </q-item-section>
-          </q-item>
-          <q-separator color="secondary" class="q-mt-sm q-mb-xl" size="2px" />
-          <q-item :to="{ name: 'monedas' }" exact exact-active-class="selected">
-            <q-item-section avatar>
-              <q-icon name="paid" />
-            </q-item-section>
-            <q-item-section class="titulo-color"> Monedas </q-item-section>
-          </q-item>
-          <q-separator color="secondary" class="q-mt-sm q-mb-xl" size="2px" />
-          <q-item :to="{ name: 'bancos' }" exact exact-active-class="selected">
-            <q-item-section avatar>
-              <q-icon name="paid" />
-            </q-item-section>
-            <q-item-section class="titulo-color"> Bancos </q-item-section>
-          </q-item>
-          <q-separator color="secondary" class="q-mt-sm q-mb-xl" size="2px" />
-          <q-item
-            :to="{ name: 'impuestos' }"
-            exact
-            exact-active-class="selected"
-          >
-            <q-item-section avatar>
-              <q-icon name="paid" />
-            </q-item-section>
-            <q-item-section class="titulo-color"> Impuestos </q-item-section>
-          </q-item>
-          <q-separator color="secondary" class="q-mt-sm q-mb-xl" size="2px" />
-        </q-list>
-      </q-scroll-area>
+      <div>
+        <TreeNavigation
+          v-for="row of navLinks"
+          :key="row.text"
+          :node="row"
+          :group="'some'"
+          :mini-drawer="miniDrawerState"
+        ></TreeNavigation>
+      </div>
+      <div
+        class="absolute drawer-btn_open"
+        :class="{
+          'drawer-btn_close': miniDrawerStateController,
+          hidden: !isDesktop,
+        }"
+        style="top: 15px; right: -17px"
+      >
+        <q-btn
+          dense
+          round
+          unelevated
+          color="accent"
+          icon="chevron_left"
+          class="text-white"
+          @click.prevent.stop="
+            isDesktop
+              ? (miniDrawerStateController = !miniDrawerStateController)
+              : undefined
+          "
+        />
+      </div>
+      <div class="column justify-end items-center q-pa-md">
+        <router-link to="/administracion">
+          <q-img
+            src="~assets/logo.svg"
+            alt="aibiz"
+            fit="contain"
+            :width="miniDrawerState ? '100%' : '130px'"
+          ></q-img>
+        </router-link>
+      </div>
     </q-drawer>
     <q-page-container style="background: rgba(196, 196, 196, 0.2)">
       <router-view />
@@ -114,6 +100,7 @@ import { useRoute, useRouter } from "vue-router";
 import { Screen } from "quasar";
 
 import UserLogout from "components/UserLogout.vue";
+import TreeNavigation from "src/components/TreeNavigation.vue";
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -123,9 +110,47 @@ const miniDrawerState = ref(false);
 
 const instance = getCurrentInstance();
 
+const navLinks = [
+  {
+    text: "Empresas",
+    key: "0",
+    icon: "apartment",
+    route: "empresas",
+  },
+  {
+    text: "Usuarios",
+    key: "1",
+    icon: "person",
+    route: "usuarios",
+  },
+  {
+    text: "Monedas",
+    key: "2",
+    icon: "paid",
+    route: "monedas",
+  },
+  {
+    text: "Bancos",
+    key: "3",
+    icon: "account_balance",
+    route: "bancos",
+  },
+  {
+    text: "Impuestos",
+    key: "4",
+    icon: "real_estate_agent",
+    route: "impuestos",
+  },
+];
+
 const isDesktop = computed(() => {
-  return Screen.gt.xs;
+  return Screen.gt.sm;
 });
+
+const isMobile = computed(() => {
+  return Screen.lt.sm;
+});
+
 const miniDrawerStateController = computed({
   get() {
     if (isDesktop.value) return miniDrawerState.value;
@@ -137,10 +162,11 @@ const miniDrawerStateController = computed({
     drawer.value = value;
   },
 });
+
 watch(
-  () => isDesktop.value,
+  () => isMobile.value,
   (value) => {
-    if (value) {
+    if (!value) {
       drawer.value = false;
       miniDrawerState.value = false;
     }
@@ -148,36 +174,15 @@ watch(
 );
 </script>
 <style scoped>
-.square {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 160px;
-  height: 55px;
-  background: var(--q-secondary, #f25512);
-  color: #fff;
-  border-radius: 20px;
-  transition: all 0.3s;
+.drawer-btn_open {
+  transition: transform 0.3s;
+  transform: scale(0.9);
 }
-.square.mini {
-  width: 35px;
-  height: 35px;
-  border-radius: 0;
+.drawer-btn_close {
+  transform: scale(0.7) rotate(180deg);
 }
-.list-links {
-  margin-top: 40px;
-}
-.list-links .selected .q-item__section--avatar i {
-  color: #fff;
-}
-.list-links .selected .q-item__section--avatar i::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  padding: 6px;
-  border-radius: 20px;
-  background: var(--q-primary);
-  z-index: -1;
+:deep(.q-item__section.q-item__section--avatar) {
+  padding-right: 16px !important;
+  min-width: auto;
 }
 </style>
