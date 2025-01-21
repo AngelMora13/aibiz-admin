@@ -1,18 +1,8 @@
 <template>
-  <q-page class="login-page row no-wrap">
-    <div class="wrap-content col-12 col-md-6">
+  <q-page class="login-page row no-wrap" dark>
+    <div class="wrap-content col-12">
       <LoginForm v-if="isLoginSelected" @login-sucess="handleLogin"></LoginForm>
       <RegistrarForm v-else></RegistrarForm>
-    </div>
-    <div class="wrap-content col-12 col-md-6" v-if="isDesktop">
-      <div
-        class="banner"
-        :style="{
-          '--bg-color': isLoginSelected
-            ? getCssVar('primary')
-            : getCssVar('secondary'),
-        }"
-      ></div>
     </div>
   </q-page>
 </template>

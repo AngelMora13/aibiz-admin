@@ -11,12 +11,12 @@
     <span class="text-no-wrap">{{ userStore.user.nombre }}</span>
 
     <q-menu>
-      <div class="column q-pa-md gap-1 text-primary">
+      <div class="column q-pa-md gap-1 text-black">
         <p class="q-ma-none text-subtitle2">Cuenta</p>
         <div class="row no-wrap justify-center items-center">
           <q-avatar
             class="q-mr-sm"
-            color="primary"
+            color="black"
             text-color="white"
             icon="person"
           ></q-avatar>
@@ -31,7 +31,7 @@
         </div>
         <q-separator color="secondary" />
         <q-btn
-          color="primary"
+          color="black"
           flat
           dense
           class="no-hover texto-4 text-capitalize items-start q-pa-none"
@@ -43,7 +43,7 @@
         </q-btn>
         <q-separator color="secondary" />
         <q-btn
-          color="primary"
+          color="black"
           flat
           dense
           class="no-hover texto-4 text-capitalize items-start q-pa-none"
