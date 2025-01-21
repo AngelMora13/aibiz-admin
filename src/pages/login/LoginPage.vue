@@ -36,7 +36,7 @@ const isDesktop = computed(() => {
   return Screen.gt.sm;
 });
 onMounted(() => {
-  if (userStore.isLogin) router.push({ name: "home" });
+  if (userStore.isLogin) router.push({ name: "administracion" });
   const query = route.query;
   isLoginSelected = !(query && query["registrar"]);
 });
@@ -50,7 +50,7 @@ watch(
   () => userStore.isLogin,
   (value) => {
     if (routerToAfterLogin && value) return router.push(routerToAfterLogin);
-    router.push({ name: "home" });
+    router.push({ name: "administracion" });
   }
 );
 watch(

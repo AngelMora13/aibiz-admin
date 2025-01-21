@@ -38,7 +38,10 @@ export default route(function ({ store /*ssrContext*/ }) {
     const userStore = useUserStore();
     if (to.meta.auth) {
       if (userStore.isLogin) return true;
-      return { name: "do-login", query: { to: to.path } };
+      return {
+        name: "do-login",
+        query: { to: to === "/" ? "administracion" : to.path },
+      };
     }
     return true;
     /*

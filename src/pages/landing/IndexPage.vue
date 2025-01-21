@@ -7,4 +7,10 @@
     />
   </q-page>
 </template>
-<script setup></script>
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const router = ref(useRouter());
+router.value.push({ name: "login" });
+</script>
