@@ -141,6 +141,12 @@ const navLinks = [
     icon: "real_estate_agent",
     route: "impuestos",
   },
+  {
+    text: "Planes",
+    key: "5",
+    icon: "language",
+    route: "planes",
+  },
 ];
 
 const isDesktop = computed(() => {

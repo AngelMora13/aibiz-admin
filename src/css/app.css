@@ -110,6 +110,35 @@ a:visited {
   background: var(--q-accent);
   border-radius: 20px;
 }
+.dialog-card {
+  padding-inline: 20px;
+  padding-bottom: 20px;
+}
+.dialog-card_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+
+  font-size: 1.125rem;
+  font-weight: 500;
+
+  padding-top: 8px;
+  padding-bottom: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+}
+.dialog-card_header > .q-btn,
+.dialog-btn_close {
+  padding-inline: 0;
+}
+.dialog-card_body,
+.dialog-card_header + div {
+  padding-top: 8px;
+  padding-bottom: 24px;
+}
 @media only screen and (max-width: 600px) {
   .flex-responsive {
     flex-direction: column;
