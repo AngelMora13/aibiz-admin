@@ -22,6 +22,9 @@ const Endpoint = {
       password,
     });
   },
+  planes({ path, body }) {
+    return mainServer.post(url + `/v1/planes/${path}`, body);
+  },
   monedas({ path, body }) {
     return mainServer.post(url + `/v1/monedas/${path}`, body);
   },

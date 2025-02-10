@@ -3,18 +3,14 @@
     class="q-px-lg q-py-md item-card"
     bordered
     flat
-    style="border-radius: 12px"
+    style="border-radius: 12px; max-width: 300px"
   >
     <q-card-section class="row q-col-gutter-md">
-      <div class="col-3 q-pl-none q-pt-none">
-        <q-avatar color="secondary" size="60px" class="text-white">
-          {{ name }}
-        </q-avatar>
-      </div>
-      <div class="col-9 q-pl-sm q-pt-none">
+      <div class="col-12 q-pt-none column justify-center items-center">
         <p
           class="item-title ellipsis-2-lines q-mb-none text-capitalize"
           :title="plan.nombre"
+          style="font-size: 16px"
         >
           {{ plan?.nombre }}
         </p>
@@ -22,31 +18,48 @@
           class="item-subtitle ellipsis q-mb-none text-subtitle2 text-grey"
           :title="plan.tipo.text"
         >
-          {{ plan?.tipo.text }}
+          {{ tiposPlanes[plan?.tipo] }}
         </p>
       </div>
     </q-card-section>
-    <div class="flex" style="gap: 5px">
-      <q-chip
-        color="secondary"
-        text-color="white"
-        class=""
-        dense
-        v-for="modulo of visibleModulos"
-        :key="modulo._id"
-      >
-        <span>{{ modulo.text.substring(0, 15) + "..." }}</span>
-        <q-tooltip
-          class="secondary"
-          anchor="top middle"
-          self="bottom middle"
-          :offset="[10, 10]"
+    <q-card-section class="row q-col-gutter-md q-pa-none">
+      <div class="col-12 q-pt-none column justify-center items-end">
+        <p class="item-title ellipsis-2-lines q-mb-none text-capitalize">
+          $
+          {{
+            (plan?.precio || 0).toLocaleString("de-DE", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })
+          }}
+        </p>
+      </div>
+    </q-card-section>
+    <q-list>
+      <template v-for="group in groupedModulos">
+        <q-item-label
+          header
+          v-if="group.length"
+          :key="group[0].tipo"
+          class="q-py-none"
+          style="font-size: 13px"
         >
-          <span style="font-size: 12px">{{ modulo.text }}</span>
-        </q-tooltip>
-      </q-chip>
-      <q-btn v-if="showVerMas" color="secondary" flat dense> ...Ver más </q-btn>
-    </div>
+          {{ getTipoText(group[0].tipo) }}
+        </q-item-label>
+        <q-item v-for="modulo in group" :key="modulo.value" dense>
+          <q-item-section side thumbnail>
+            <q-icon
+              name="check"
+              color="secondary"
+              class="listModulos"
+              v-if="modulo.activo"
+            />
+            <q-icon name="close" color="negative" class="listModulos" v-else />
+          </q-item-section>
+          <q-item-section class="listModulos">{{ modulo.text }}</q-item-section>
+        </q-item>
+      </template>
+    </q-list>
   </q-card>
 </template>
 
@@ -59,6 +72,7 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+const tiposPlanes = { comercial: "Plan Comercial", contador: "Plan Contador" };
 const mostrarTodos = ref(false);
 const name = computed(() => {
   const nombre = (props.plan?.nombre || "").split("");
@@ -74,9 +88,29 @@ const showVerMas = computed(() => {
   return !mostrarTodos.value && props.plan.modulos.length > 3;
 });
 
+const groupedModulos = computed(() => {
+  return Object.values(
+    props.plan.modulos.reduce((groups, modulo) => {
+      if (!groups[modulo.tipo]) {
+        groups[modulo.tipo] = [];
+      }
+      groups[modulo.tipo].push(modulo);
+      return groups;
+    }, {})
+  );
+});
 onMounted(async () => {
   console.log(props.plan);
 });
+const getTipoText = (tipo) => {
+  const tipoTextos = {
+    gestionContable: "Gestión Contable",
+    gestionTributaria: "Gestión Tributaria",
+    gestionOperativa: "Gestión Operativa",
+    gestionFinanciera: "Gestión Financiera",
+  };
+  return tipoTextos[tipo] || "Otros";
+};
 </script>
 <style scoped>
 .q-avatar {
@@ -99,5 +133,8 @@ onMounted(async () => {
 .item-title,
 .item-subtitle {
   line-height: normal;
+}
+.listModulos {
+  font-size: 11px;
 }
 </style>
