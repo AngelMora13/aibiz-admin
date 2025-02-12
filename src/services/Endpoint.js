@@ -22,6 +22,9 @@ const Endpoint = {
       password,
     });
   },
+  planes({ path, body }) {
+    return mainServer.post(url + `/v1/planes/${path}`, body);
+  },
   monedas({ path, body }) {
     return mainServer.post(url + `/v1/monedas/${path}`, body);
   },
@@ -65,6 +68,11 @@ const Endpoint = {
   },
   disableManyEmpresas(empresaData) {
     return mainServer.post(url + "/v1/sub-dominios/disabledMany", {
+      empresaData,
+    });
+  },
+  deleteEmpresa(empresaData) {
+    return mainServer.post(url + "/v1/sub-dominios/delete", {
       empresaData,
     });
   },

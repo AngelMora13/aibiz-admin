@@ -71,6 +71,11 @@ const routes = [
         name: "impuestos",
         component: () => import("src/pages/admin/ImpuestosPage.vue"),
       },
+      {
+        path: "planes",
+        name: "planes",
+        component: () => import("src/pages/admin/PlanesPage.vue"),
+      },
     ],
   },
 

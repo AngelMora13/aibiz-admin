@@ -78,6 +78,23 @@
           </template>
         </q-input>
         <q-select
+          v-model="empresaData.plan"
+          class="col-6"
+          placeholder="Planes"
+          dense
+          :options="planes"
+          stack-label
+          option-label="nombreMostrar"
+          outlined
+          color="secondary"
+        >
+          <template v-slot:selected-item="scope">
+            <span v-if="scope.opt?.nombre">
+              {{ scope.opt?.nombre }} ({{ tiposPlanes[scope.opt?.tipo] }})
+            </span>
+          </template>
+        </q-select>
+        <!--<q-select
           v-model="empresaData.modulosId"
           class="col-12"
           placeholder="Modulos Disponibles"
@@ -111,7 +128,7 @@
               }}
             </q-chip>
           </template>
-        </q-select>
+        </q-select> -->
       </div>
       <div class="column row-sm justify-end" v-if="formType === 'crear'">
         <q-btn
@@ -127,7 +144,9 @@
         class="flex-responsive justify-between q-mt-lg"
         v-if="formType === 'editar'"
       >
-        <q-btn flat color="#C4C4C4" class="color-disabled"> Eliminar </q-btn>
+        <q-btn flat color="negative" @click="openAlerDelete = true">
+          Eliminar
+        </q-btn>
         <div class="flex-responsive">
           <q-btn
             outline
@@ -164,12 +183,59 @@
         </q-btn>
       </div>
     </q-dialog>
+    <q-dialog v-model="openAlerDelete">
+      <div class="alert-container">
+        <span> ¿Está seguro(a) que desea eliminaresta empresa? </span>
+        <q-btn
+          color="negative text-capitalize"
+          class="q-mb-md"
+          @click="openDialogConfirmDelete = true"
+        >
+          Eliminar
+        </q-btn>
+      </div>
+    </q-dialog>
+    <q-dialog v-model="openDialogConfirmDelete">
+      <q-card>
+        <div class="row justify-center" style="font-size: 16px; padding: 16px">
+          <p>¿Está seguro(a) que desea eliminaresta empresa?</p>
+          <span style="font-size: 14px; color: red">
+            '* Se perderá toda la informacion que tenga la empresa'
+          </span>
+          <div class="column">
+            <span style="font-size: 12px"
+              >Para eliminar la empresa escriba
+              <strong>{{ empresaData.subDominio }}</strong></span
+            >
+            <q-input
+              outlined
+              dense
+              v-model="textConfirm"
+              borderless
+              color="#000"
+            ></q-input>
+          </div>
+        </div>
+        <div class="row justify-center text-h6">
+          <q-btn
+            unelevated
+            label="Aceptar"
+            color="red"
+            class="q-mb-sm"
+            :loading="loaderDelete"
+            @click="deleteSubDominio"
+            :disable="textConfirm !== empresaData.subDominio"
+          ></q-btn>
+        </div>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 <script setup>
 import { ref, onMounted, computed, watch, defineProps, defineEmits } from "vue";
 import { useUserStore } from "stores/user-store";
 import endpoint from "../services/Endpoint";
+import { tiposPlanes } from "app/constants/magicString";
 
 const props = defineProps({
   empresa: {
@@ -180,12 +246,17 @@ const props = defineProps({
     type: String,
   },
 });
-const emit = defineEmits(["update:empresa", "desactivar", "submit"]);
+const emit = defineEmits(["update:empresa", "desactivar", "submit", "delete"]);
 const userStore = useUserStore();
 const empresaForm = ref(null);
 const typesDocument = ["J", "V"];
 const listOfModules = ref([]);
+const planes = ref([]);
 const openAlertDisabled = ref(false);
+const openAlerDelete = ref(false);
+const openDialogConfirmDelete = ref(false);
+const loaderDelete = ref(false);
+const textConfirm = ref("");
 /*
 const empresaData = ref({
   razonSocial: "",
@@ -223,6 +294,7 @@ onMounted(() => {
     });
   }
   getModules();
+  getLisPlanes();
 });
 const getModules = async () => {
   try {
@@ -236,8 +308,24 @@ const crearSubDominio = async () => {
   try {
     const token = userStore.$state.token;
     empresaData.value.documentoIdentidad = `${empresaData.value.tipoDocumento}${empresaData.value.documentoIdentidad}`;
+    console.log(empresaData.value);
+    for (const modulosPlan of empresaData.value?.plan?.modulos) {
+      if (!modulosPlan?.activo) continue;
+      console.log(modulosPlan);
+      if (modulosPlan.modulos && modulosPlan.modulos.length[0]) {
+        for (const modulo of modulosPlan.modulos) {
+          const keyModulo = listOfModules.value.find(
+            (e) => e.nombre === modulo
+          )._id;
+          const indexKey = empresaData.value.modulosId.findIndex(
+            (e) => e === keyModulo
+          );
+          if (indexKey === -1) empresaData.value.modulosId.push(keyModulo);
+        }
+      }
+    }
     empresaForm.value?.validate().then(async (success) => {
-      if (success) {
+      /* if (success) {
         console.log("formulario validado", success);
         const { data } = await endpoint.createSubDominio({
           token,
@@ -248,10 +336,31 @@ const crearSubDominio = async () => {
         console.log(empresaData.value);
       } else {
         console.log("form no valido", success);
-      }
+      } */
     });
   } catch (e) {
     console.log(e);
+  }
+};
+const deleteSubDominio = () => {
+  loaderDelete.value = true;
+  emit("delete");
+};
+const getLisPlanes = async () => {
+  try {
+    const { data } = await endpoint.planes({
+      body: {},
+      path: "get",
+    });
+    data.planes?.forEach((e) => {
+      e.nombreMostrar = `${e.nombre} (${tiposPlanes[e.tipo]})`;
+      planes.value = data.planes;
+    });
+  } catch (e) {
+    console.log(e);
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
+  } finally {
+    //loaderIva.value = false;
   }
 };
 watch(
