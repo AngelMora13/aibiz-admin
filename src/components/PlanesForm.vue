@@ -89,6 +89,33 @@
         ></CurrencyField>
       </div>
       <div class="form-field">
+        <q-checkbox
+          v-model="plan.tieneConfiguracion"
+          label="Tiene configuración inicial"
+          color="secondary"
+          dense
+        />
+      </div>
+      <div class="form-field">
+        <p>Soporte Técnico</p>
+        <q-radio
+          v-model="plan.soporteTecnico"
+          val="estandar"
+          label="Estandar"
+          color="secondary"
+          dense
+          class="q-px-sm"
+        />
+        <q-radio
+          v-model="plan.soporteTecnico"
+          val="especializado"
+          label="Especializado"
+          color="secondary"
+          dense
+          class="q-px-sm"
+        />
+      </div>
+      <div class="form-field">
         <q-list>
           <div class="flex justify-end">
             <q-btn color="secondary" dense @click="selectAll"
@@ -194,6 +221,8 @@ const plan = ref({
   descuento12: 0,
   destuento6: 0,
   modulos: [],
+  soporteTecnico: "estandar",
+  tieneConfiguracion: false,
 });
 const groupedModulos = computed(() => {
   return Object.values(
