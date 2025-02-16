@@ -147,6 +147,12 @@ const navLinks = [
     icon: "language",
     route: "planes",
   },
+  {
+    text: "Metodos pago",
+    key: "6",
+    icon: "payments",
+    route: "metodos-pago",
+  },
 ];
 
 const isDesktop = computed(() => {

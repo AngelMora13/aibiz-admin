@@ -27,12 +27,16 @@ export const useUserStore = defineStore("user", {
           const { data } = await this.getUser({ token });
           this.token = token;
           this.user = data;
+          return true;
         } catch (e) {
           console.log(e);
           localStorage.removeItem("token");
         }
+        this.isLoginLoading = false;
+        return false;
       }
       this.isLoginLoading = false;
+      return false;
     },
     async getUser(token) {
       return Endpoint.getUserByToken(token);
