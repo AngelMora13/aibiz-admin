@@ -22,6 +22,9 @@ const Endpoint = {
       password,
     });
   },
+  getUser({ path, body }) {
+    return mainServer.post(url + `/v1/users/${path}`, body);
+  },
   planes({ path, body }) {
     return mainServer.post(url + `/v1/planes/${path}`, body);
   },

@@ -1,10 +1,5 @@
 <template>
   <q-page class="column gap-2 page-main overflow-auto">
-    <SearchInput
-      v-model:searchInput="searchInput"
-      textBtn="Crear Empresa"
-      @openDialog="(value) => (openFormEmpresa = value)"
-    ></SearchInput>
     <div
       class="overflow-auto"
       style="max-width: 100%; background-color: transparent"
@@ -13,18 +8,19 @@
         flat
         bordered
         :columns="headers"
-        selection="multiple"
-        :rows="empresasList"
+        :rows="suscriptoresList"
         row-key="_id"
         v-model:selected="empresaSelect"
         class="q-pa-md"
         table-header-class="texto-th"
-        :selected-rows-label="(n) => n + ' seleccionados'"
         rows-per-page-label="Filas por página"
         :pagination-label="
           (first, end, total) => first + ' - ' + end + ' de ' + total
         "
       >
+        <!--
+        :selected-rows-label="(n) => n + ' seleccionados'"
+        selection="multiple"-->
         <template v-slot:no-data>
           <div class="full-width row flex-center text-accent q-gutter-sm">
             <span> No se encontrarón resultados </span>
@@ -32,8 +28,10 @@
         </template>
         <template v-slot:top>
           <div class="row w-100 justify-between">
-            <h1 class="no-margin titulo-3 titulo-color">Lista de Empresas</h1>
-            <div class="table-btn">
+            <h1 class="no-margin titulo-3 titulo-color">
+              Lista de Suscriptores
+            </h1>
+            <!--<div class="table-btn">
               <q-btn
                 color="negative"
                 class="q-mr-md text-capitalize"
@@ -48,20 +46,23 @@
                 @click="openAlertDisabled"
                 >Desactivar</q-btn
               >
-            </div>
+            </div>-->
           </div>
         </template>
-        <template v-slot:body-selection="scope">
+        <!--<template v-slot:body-selection="scope">
           <q-checkbox
             v-model="scope.selected"
             :class="{ inactivo: !scope.row.activo }"
             v-if="scope.row.activo"
           />
-        </template>
+        </template>-->
         <template v-slot:body-cell-fechaCreacion="props">
           <q-td :props="props">
             {{ date.formatDate(props.value, "DD-MM-YYYY") }}
           </q-td>
+        </template>
+        <template v-slot:body-cell-documentoIdentidad="{ row }">
+          <q-td> {{ row.tipoDocumento }}{{ row.documentoIdentidad }} </q-td>
         </template>
         <template v-slot:body-cell-acciones="props">
           <q-td :props="props">
@@ -124,7 +125,7 @@ const userStore = useUserStore();
 const searchInput = ref("");
 
 const openFormEmpresa = ref(false);
-const listEmpresas = ref([]);
+const suscriptores = ref([]);
 const empresaSelect = ref([]);
 const accionAlert = ref("");
 const openAlertDisableDelete = ref(false);
@@ -148,19 +149,17 @@ const empresaFormDataDefault = ref({
   modulos: [],
 });
 const formType = ref("crear");
-const empresasList = computed({
+const suscriptoresList = computed({
   get() {
-    let newEmpresas = listEmpresas.value;
-    return newEmpresas.filter(
+    let newSuscriptores = suscriptores.value;
+    return newSuscriptores.filter(
       (emp) =>
-        emp.razonSocial
-          ?.toLowerCase()
-          .includes(searchInput.value.toLowerCase()) ||
-        emp.email?.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        emp.nombre?.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+        emp.email?.toLowerCase().includes(searchInput.value.toLowerCase()) /*||
         emp.subDominio
           ?.toLowerCase()
           .includes(searchInput.value.toLowerCase()) ||
-        emp.telefono?.toLowerCase().includes(searchInput.value.toLowerCase())
+        emp.telefono?.toLowerCase().includes(searchInput.value.toLowerCase())*/
     );
   },
 });
@@ -168,21 +167,16 @@ const empresasList = computed({
 const headers = computed(() => {
   return [
     {
-      label: "Dominio",
-      field: "subDominio",
-      name: "subDominio",
-      align: "left",
-      sortable: true,
-    },
-    {
-      label: "Razón Social",
-      field: "razonSocial",
+      label: "Nombre",
+      field: "nombre",
+      name: "nombre",
       align: "left",
       sortable: true,
     },
     {
       label: "Documento de Identidad",
       field: "documentoIdentidad",
+      name: "documentoIdentidad",
       align: "left",
       sortable: true,
     },
@@ -193,36 +187,30 @@ const headers = computed(() => {
       sortable: true,
     },
     {
-      label: "Teléfono",
-      field: "telefono",
-      align: "left",
-      sortable: true,
-    },
-    {
-      label: "Fecha de Creación",
+      label: "Fecha de Registro",
       field: "fechaCreacion",
       name: "fechaCreacion",
       align: "left",
       sortable: true,
     },
-    {
-      label: "Acciones",
-      name: "acciones",
-      align: "left",
-      sortable: false,
-    },
   ];
 });
 onMounted(() => {
-  getSubDominios();
+  getListUser();
 });
-const getSubDominios = async () => {
+const getListUser = async () => {
   try {
-    const { data } = await endpoint.getListSubDominios();
-    listEmpresas.value = data;
-    console.log(data, listEmpresas);
+    const { data } = await endpoint.getUser({
+      body: {},
+      path: "getSucriptores",
+    });
+    console.log({ data });
+    suscriptores.value = data.personas;
   } catch (e) {
     console.log(e);
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
+  } finally {
+    //loaderIva.value = false;
   }
 };
 const handleEditform = (empresa) => {
@@ -324,7 +312,7 @@ watch(
   (value) => {
     if (!value) {
       formType.value = "crear";
-      empresaFormData.value = { ...empresaFormDataDefault.value };
+      empresaFormData.value = empresaFormDataDefault.value;
     }
   }
 );

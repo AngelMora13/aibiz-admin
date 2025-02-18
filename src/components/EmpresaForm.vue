@@ -18,7 +18,7 @@
             <q-icon name="format_color_text" color="secondary" />
           </template>
         </q-input>
-        <q-input
+        <!--<q-input
           v-model="empresaData.email"
           class="col-12 col-sm-6"
           placeholder="Email"
@@ -30,7 +30,22 @@
           <template v-slot:prepend>
             <q-icon name="alternate_email" color="secondary" />
           </template>
-        </q-input>
+        </q-input>-->
+        <q-select
+          v-model="empresaData.suscriptor"
+          :options="suscriptoresList"
+          class="col-12 col-sm-6"
+          placeholder="Suscriptor"
+          option-label="nombre"
+          dense
+          outlined
+          color="secondary"
+          :rules="rules.requeridos"
+        >
+          <template v-slot:prepend>
+            <q-icon name="person" color="secondary" />
+          </template>
+        </q-select>
         <q-input
           v-model="empresaData.telefono"
           class="col-12 col-sm-6"
@@ -79,7 +94,7 @@
         </q-input>
         <q-select
           v-model="empresaData.plan"
-          class="col-6"
+          class="col-5"
           placeholder="Planes"
           dense
           :options="planes"
@@ -94,6 +109,42 @@
             </span>
           </template>
         </q-select>
+        <div class="col-2 column q-pa-none">
+          <p style="font-size: 10px; padding-left: 20px; margin: 0">
+            Cant. Planes
+          </p>
+          <cantPlanesField
+            :value="empresaData?.cantPlanes"
+            :tipo="'planes'"
+            :counterMin="1"
+            @update:value="updateValues($event, 'cantPlanes')"
+          />
+        </div>
+        <div class="col-2 column q-pa-none">
+          <p style="font-size: 10px; padding-left: 20px; margin: 0">
+            Cant. Meses
+          </p>
+          <cantPlanesField
+            :value="empresaData?.cantMeses"
+            :tipo="'meses'"
+            :counterMax="12"
+            @update:value="updateValues($event, 'cantMeses')"
+          />
+        </div>
+        <div class="col-3 column q-pa-none">
+          <p style="font-size: 10px; margin: 0">Fecha de Vencimiento</p>
+          <q-input
+            v-model="empresaData.newFechaVencimiento"
+            dense
+            outlined
+            color="primary"
+            disable
+          >
+            <template v-slot:prepend>
+              <q-icon name="event" color="secondary" />
+            </template>
+          </q-input>
+        </div>
         <!--<q-select
           v-model="empresaData.modulosId"
           class="col-12"
@@ -236,7 +287,8 @@ import { ref, onMounted, computed, watch, defineProps, defineEmits } from "vue";
 import { useUserStore } from "stores/user-store";
 import endpoint from "../services/Endpoint";
 import { tiposPlanes } from "app/constants/magicString";
-
+import cantPlanesField from "src/components/cantPlanesField.vue";
+import { qDate } from "src/utils/qDate";
 const props = defineProps({
   empresa: {
     required: true,
@@ -252,6 +304,7 @@ const empresaForm = ref(null);
 const typesDocument = ["J", "V"];
 const listOfModules = ref([]);
 const planes = ref([]);
+const suscriptoresList = ref([]);
 const openAlertDisabled = ref(false);
 const openAlerDelete = ref(false);
 const openDialogConfirmDelete = ref(false);
@@ -295,7 +348,20 @@ onMounted(() => {
   }
   getModules();
   getLisPlanes();
+  getListUser();
 });
+const updateValues = (event, tipo) => {
+  empresaData.value[tipo] = event;
+  if (tipo === "cantMeses") {
+    const fecha = empresaData.value?.fechaVencimiento
+      ? qDate(empresaData.value?.fechaVencimiento)
+      : qDate();
+    empresaData.value.newFechaVencimiento = fecha
+      .add(event, "month")
+      .format("YYYY-MM-DD");
+    console.log(empresaData.value.newFechaVencimiento);
+  }
+};
 const getModules = async () => {
   try {
     const { data } = await endpoint.getListModules();
@@ -308,22 +374,25 @@ const crearSubDominio = async () => {
   try {
     const token = userStore.$state.token;
     empresaData.value.documentoIdentidad = `${empresaData.value.tipoDocumento}${empresaData.value.documentoIdentidad}`;
-    console.log(empresaData.value);
+    empresaData.value.email = empresaData.value?.suscriptor?.email;
+    empresaData.value.modulosId = [];
     for (const modulosPlan of empresaData.value?.plan?.modulos) {
       if (!modulosPlan?.activo) continue;
-      console.log(modulosPlan);
-      if (modulosPlan.modulos && modulosPlan.modulos.length[0]) {
+      if (modulosPlan.modulos && modulosPlan.modulos[0]) {
         for (const modulo of modulosPlan.modulos) {
           const keyModulo = listOfModules.value.find(
             (e) => e.nombre === modulo
-          )._id;
-          const indexKey = empresaData.value.modulosId.findIndex(
-            (e) => e === keyModulo
           );
-          if (indexKey === -1) empresaData.value.modulosId.push(keyModulo);
+          console.log({ keyModulo });
+          const indexKey = empresaData.value?.modulosId?.findIndex(
+            (e) => e === keyModulo.key
+          );
+          console.log({ indexKey });
+          if (indexKey === -1) empresaData.value.modulosId.push(keyModulo.key);
         }
       }
     }
+    console.log(empresaData.value);
     empresaForm.value?.validate().then(async (success) => {
       /* if (success) {
         console.log("formulario validado", success);
@@ -356,6 +425,21 @@ const getLisPlanes = async () => {
       e.nombreMostrar = `${e.nombre} (${tiposPlanes[e.tipo]})`;
       planes.value = data.planes;
     });
+  } catch (e) {
+    console.log(e);
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
+  } finally {
+    //loaderIva.value = false;
+  }
+};
+const getListUser = async () => {
+  try {
+    const { data } = await endpoint.getUser({
+      body: {},
+      path: "getSucriptores",
+    });
+    console.log({ data });
+    suscriptoresList.value = data.personas;
   } catch (e) {
     console.log(e);
     alert(e.response?.data?.error || "Ha ocurrido un error inesperado");

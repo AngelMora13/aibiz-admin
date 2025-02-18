@@ -118,6 +118,12 @@ const navLinks = [
     route: "empresas",
   },
   {
+    text: "Suscriptores",
+    key: "6",
+    icon: "groups",
+    route: "suscriptores",
+  },
+  {
     text: "Usuarios",
     key: "1",
     icon: "person",
