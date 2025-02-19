@@ -73,24 +73,31 @@ const props = defineProps({
   },
 });
 const tiposPlanes = { comercial: "Plan Comercial", contador: "Plan Contador" };
-const mostrarTodos = ref(false);
-const name = computed(() => {
-  const nombre = (props.plan?.nombre || "").split("");
-  console.log(nombre);
-  return `${nombre[0]}${nombre[1]}`.toUpperCase();
-});
-const visibleModulos = computed(() => {
-  return mostrarTodos.value
-    ? props.plan.modulos
-    : props.plan.modulos.slice(0, 3);
-});
-const showVerMas = computed(() => {
-  return !mostrarTodos.value && props.plan.modulos.length > 3;
+const orderTypes = {
+  comercial: [
+    "gestionOperativa",
+    "gestionFinanciera",
+    "gestionContable",
+    "gestionTributaria",
+  ],
+  contador: [
+    "gestionContable",
+    "gestionTributaria",
+    "gestionOperativa",
+    "gestionFinanciera",
+  ],
+};
+
+const sortedModulos = computed(() => {
+  const order = orderTypes[props.plan.tipo] || [];
+  return props.plan.modulos.slice().sort((a, b) => {
+    return order.indexOf(a.tipo) - order.indexOf(b.tipo);
+  });
 });
 
 const groupedModulos = computed(() => {
   return Object.values(
-    props.plan.modulos.reduce((groups, modulo) => {
+    sortedModulos.value.reduce((groups, modulo) => {
       if (!groups[modulo.tipo]) {
         groups[modulo.tipo] = [];
       }
@@ -100,7 +107,7 @@ const groupedModulos = computed(() => {
   );
 });
 onMounted(async () => {
-  console.log(props.plan);
+  // console.log(props.plan);
 });
 const getTipoText = (tipo) => {
   const tipoTextos = {

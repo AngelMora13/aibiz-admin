@@ -82,6 +82,7 @@
         <EmpresaForm
           v-model:empresa="empresaFormData"
           :formType="formType"
+          :isInternal="true"
           @desactivar="disabledEmpresa"
           @submit="handleSubmit"
           @delete="deleteEmpresa"
@@ -137,6 +138,7 @@ const empresaFormData = ref({
   documentoIdentidad: "",
   subDominio: "",
   modulos: [],
+  sinLimiteFecha: false,
 });
 const empresaFormDataDefault = ref({
   razonSocial: "",
@@ -146,6 +148,7 @@ const empresaFormDataDefault = ref({
   documentoIdentidad: "",
   subDominio: "",
   modulos: [],
+  sinLimiteFecha: false,
 });
 const formType = ref("crear");
 const empresasList = computed({

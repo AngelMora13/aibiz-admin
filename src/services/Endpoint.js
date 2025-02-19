@@ -23,7 +23,7 @@ const Endpoint = {
     });
   },
   getUser({ path, body }) {
-    return mainServer.post(url + `/v1/users/${path}`, body);
+    return mainServer.post(url + `/users/${path}`, body);
   },
   planes({ path, body }) {
     return mainServer.post(url + `/planes/${path}`, body);

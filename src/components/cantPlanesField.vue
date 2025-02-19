@@ -7,6 +7,7 @@
       dense
       color="secondary"
       class="q-ma-none q-pa-none"
+      :disable="disabled"
     />
     <q-input
       v-model="counter"
@@ -16,6 +17,7 @@
       dense
       style="width: 60px"
       @update:model-value="checkMin"
+      :disable="disabled"
     >
     </q-input>
     <q-btn
@@ -25,6 +27,7 @@
       color="secondary"
       dense
       class="q-pa-none q-ma-none"
+      :disable="disabled"
     />
   </div>
 </template>
@@ -46,6 +49,9 @@ const props = defineProps({
   },
   tipo: {
     type: String,
+  },
+  disabled: {
+    type: Boolean,
   },
 });
 const counter = ref(0);
@@ -85,6 +91,16 @@ watch(
   () => counter.value,
   (value) => {
     emit("update:value", value);
+  },
+  { flush: "post" }
+);
+watch(
+  () => props.disabled,
+  (value) => {
+    console.log(value);
+    if (value && props.tipo !== "planes") {
+      counter.value = 0;
+    }
   },
   { flush: "post" }
 );

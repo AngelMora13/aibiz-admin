@@ -129,6 +129,7 @@
             :tipo="'meses'"
             :counterMax="12"
             @update:value="updateValues($event, 'cantMeses')"
+            :disabled="empresaData.sinLimiteFecha"
           />
         </div>
         <div class="col-3 column q-pa-none">
@@ -145,6 +146,12 @@
             </template>
           </q-input>
         </div>
+        <q-checkbox
+          v-if="isInternal"
+          v-model="empresaData.sinLimiteFecha"
+          label="Sin Limite de Fecha"
+          color="secondary"
+        />
         <!--<q-select
           v-model="empresaData.modulosId"
           class="col-12"
@@ -292,6 +299,10 @@ import { tiposPlanes } from "src/constants/magicString";
 const props = defineProps({
   empresa: {
     required: true,
+  },
+  isInternal: {
+    default: false,
+    type: Boolean,
   },
   formType: {
     default: "crear",
@@ -453,6 +464,17 @@ watch(
     empresaForm.value?.validate().then((success) => {
       isFormValid.value = success;
     });
+  },
+  { deep: true }
+);
+watch(
+  () => empresaData.value,
+  (value) => {
+    if (value?.sinLimiteFecha) {
+      empresaData.value.cantMeses = 0;
+      empresaData.value.newFechaVencimiento = null;
+      empresaData.value.fechaVencimiento = null;
+    }
   },
   { deep: true }
 );

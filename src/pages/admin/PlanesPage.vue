@@ -1,6 +1,6 @@
 <template>
-  <q-page class="gap-2 page-main overflow-auto">
-    <div class="flex justify-between w-100">
+  <q-page class="gap-2 page-main overflow-auto" style="background: #ffffff">
+    <!--<div class="flex justify-between w-100">
       <div>
         <q-select
           v-model="tipoPlan"
@@ -21,12 +21,33 @@
         class="q-mb-sm"
         >Agregar Plan</q-btn
       >
-    </div>
-    <div class="grid-cards">
-      <div v-for="plan of planes" :key="plan._id">
-        <planesCard :plan="plan" @click="openEditPlan(plan)"></planesCard>
-      </div>
-    </div>
+    </div> -->
+    <q-tabs
+      v-model="tab"
+      class="w-100"
+      align="left"
+      dense
+      active-color="secondary"
+    >
+      <q-tab name="comercial" label="Comerciales" />
+      <q-tab name="contador" label="Contador" />
+    </q-tabs>
+    <q-tab-panels v-model="tab" class="w-100">
+      <q-tab-panel name="comercial">
+        <div class="grid-cards">
+          <div v-for="plan of planesComerciales" :key="plan._id">
+            <planesCard :plan="plan" @click="openEditPlan(plan)"></planesCard>
+          </div>
+        </div>
+      </q-tab-panel>
+      <q-tab-panel name="contador">
+        <div class="grid-cards">
+          <div v-for="plan of planesContador" :key="plan._id">
+            <planesCard :plan="plan" @click="openEditPlan(plan)"></planesCard>
+          </div>
+        </div>
+      </q-tab-panel>
+    </q-tab-panels>
     <q-dialog
       v-model="openAddPlan"
       @keydown.esc="openAddPlan = false"
@@ -56,10 +77,12 @@ import planesCard from "src/components/planesCard.vue";
 import Endpoint from "src/services/Endpoint";
 
 const userStore = useUserStore();
+const tab = ref("comercial");
 const openAddPlan = ref(false);
 const itemPlan = ref(null);
 const planes = ref([]);
-const planesFilter = ref([]);
+const planesContador = ref([]);
+const planesComerciales = ref([]);
 const tipoPlan = ref(null);
 const pagination = ref({
   page: 1,
@@ -81,8 +104,11 @@ const getLisPlanes = async () => {
       body,
       path: "get",
     });
-    planes.value = data.planes;
+    //planes.value = data.planes;
+    // console.log({ data });
     pagination.value.rowsNumber = data.countPlanes || 0;
+    planesContador.value = data.planes.filter((e) => e.tipo === "contador");
+    planesComerciales.value = data.planes.filter((e) => e.tipo === "comercial");
   } catch (e) {
     console.log(e);
     alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
