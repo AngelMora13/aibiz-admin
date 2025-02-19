@@ -235,7 +235,7 @@
 import { ref, onMounted, computed, watch, defineProps, defineEmits } from "vue";
 import { useUserStore } from "stores/user-store";
 import endpoint from "../services/Endpoint";
-import { tiposPlanes } from "app/constants/magicString";
+import { tiposPlanes } from "src/constants/magicString";
 
 const props = defineProps({
   empresa: {
