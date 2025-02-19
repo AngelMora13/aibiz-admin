@@ -81,6 +81,11 @@ const routes = [
         name: "planes",
         component: () => import("src/pages/admin/PlanesPage.vue"),
       },
+      {
+        path: "metodos-pago",
+        name: "metodos-pago",
+        component: () => import("src/pages/admin/MetodosPago.vue"),
+      },
     ],
   },
 

@@ -17,7 +17,7 @@ mainServer.interceptors.request.use(
 );
 const Endpoint = {
   login({ email, password }) {
-    return axios.post(url + "/v1/auth/login", {
+    return axios.post(url + "/auth/login", {
       email,
       password,
     });
@@ -26,67 +26,69 @@ const Endpoint = {
     return mainServer.post(url + `/v1/users/${path}`, body);
   },
   planes({ path, body }) {
-    return mainServer.post(url + `/v1/planes/${path}`, body);
+    return mainServer.post(url + `/planes/${path}`, body);
+  },
+  metodosPago({ path, body }) {
+    return mainServer.post(url + `/metodos-pago/${path}`, body);
   },
   monedas({ path, body }) {
-    return mainServer.post(url + `/v1/monedas/${path}`, body);
+    return mainServer.post(url + `/monedas/${path}`, body);
   },
   bancos({ path, body }) {
-    return mainServer.post(url + `/v1/bancos/${path}`, body);
+    return mainServer.post(url + `/bancos/${path}`, body);
   },
   impuestos({ path, body }) {
-    return mainServer.post(url + `/v1/impuestos/${path}`, body);
+    return mainServer.post(url + `/impuestos/${path}`, body);
   },
   getUserByToken({ token }) {
-    return mainServer.post(url + "/v1/auth/login", {});
+    return mainServer.post(url + "/auth/login", {});
   },
   getListSubDominios() {
-    return mainServer.get(url + "/v1/sub-dominios");
+    return mainServer.get(url + "/sub-dominios");
   },
   getListModules() {
-    return axios.get(url + "/v1/modulos");
+    return axios.get(url + "/modulos");
   },
   getUsuarios() {
-    return mainServer.get("/v1/users");
+    return mainServer.get("/users");
   },
   createUsuarios(usuario) {
-    return mainServer.post("/v1/users/create/admi", usuario);
+    return mainServer.post("/users/create/admi", usuario);
   },
   updateUsuarios(usuario) {
-    return mainServer.post("/v1/users/update/" + usuario._id, usuario);
+    return mainServer.post("/users/update/" + usuario._id, usuario);
   },
   deleteUsuarios(usuario) {
-    return mainServer.delete("/v1/users/delete/" + usuario._id);
+    return mainServer.delete("/users/delete/" + usuario._id);
   },
   deleteManyUsuarios(usuarios) {
-    return mainServer.post("/v1/users/deleteMany", usuarios);
+    return mainServer.post("/users/deleteMany", usuarios);
   },
   createSubDominio(empresaData) {
-    return mainServer.post(url + "/v1/sub-dominios/create", empresaData);
+    return mainServer.post(url + "/sub-dominios/create", empresaData);
   },
   updateEmpresa(empresaData) {
-    return mainServer.post(url + "/v1/sub-dominios/update/" + empresaData._id, {
+    return mainServer.post(url + "/sub-dominios/update/" + empresaData._id, {
       empresaData,
     });
   },
   disableManyEmpresas(empresaData) {
-    return mainServer.post(url + "/v1/sub-dominios/disabledMany", {
+    return mainServer.post(url + "/sub-dominios/disabledMany", {
       empresaData,
     });
   },
   deleteEmpresa(empresaData) {
-    return mainServer.post(url + "/v1/sub-dominios/delete", {
+    return mainServer.post(url + "/sub-dominios/delete", {
       empresaData,
     });
   },
   disabledEmpresa(empresaData) {
-    return mainServer.post(
-      url + "/v1/sub-dominios/disabled/" + empresaData._id,
-      { empresaData }
-    );
+    return mainServer.post(url + "/sub-dominios/disabled/" + empresaData._id, {
+      empresaData,
+    });
   },
   deleteManyEmpresas(empresaData) {
-    return mainServer.post(url + "/v1/sub-dominios/deleteMany", {
+    return mainServer.post(url + "/sub-dominios/deleteMany", {
       empresaData,
     });
   },

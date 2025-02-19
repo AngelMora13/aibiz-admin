@@ -7,6 +7,6 @@ import { onMounted } from "vue";
 import { useUserStore } from "stores/user-store";
 const userStore = useUserStore();
 onMounted(async () => {
-  userStore.makeLogin();
+  //userStore.makeLogin();
 });
 </script>

@@ -286,9 +286,9 @@
 import { ref, onMounted, computed, watch, defineProps, defineEmits } from "vue";
 import { useUserStore } from "stores/user-store";
 import endpoint from "../services/Endpoint";
-import { tiposPlanes } from "app/constants/magicString";
 import cantPlanesField from "src/components/cantPlanesField.vue";
 import { qDate } from "src/utils/qDate";
+import { tiposPlanes } from "src/constants/magicString";
 const props = defineProps({
   empresa: {
     required: true,

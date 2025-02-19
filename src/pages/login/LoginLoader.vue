@@ -16,18 +16,22 @@ const router = useRouter();
 const route = useRoute();
 const userStore = useUserStore();
 let routerToAfterLogin = "/administracion";
-onMounted(() => {
+onMounted(async () => {
   const query = route.query;
   if (query.to) routerToAfterLogin = decodeURIComponent(query.to);
+  const status = await userStore.makeLogin();
+  if (status) {
+    router.push(routerToAfterLogin);
+  } else {
+    router.push({ name: "login" });
+  }
+  /*
   if (routerToAfterLogin && userStore.isLogin)
     return router.push(routerToAfterLogin);
   if (userStore.isLoginLoading === false && !userStore.isLogin)
-    router.push({ name: "login" });
-  /*setTimeout(() => {
-    if (userStore.isLogin) return;
-    router.push({ name: "login" });
-  }, 2000);*/
+    router.push({ name: "login" });*/
 });
+/*
 watch(
   () => userStore.isLogin,
   (value) => {
@@ -40,7 +44,7 @@ watch(
   (value) => {
     if (value === false && !userStore.isLogin) router.push({ name: "login" });
   }
-);
+);*/
 </script>
 <style scoped>
 .login-page {
