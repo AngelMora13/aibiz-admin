@@ -155,9 +155,21 @@ const navLinks = [
   },
   {
     text: "Metodos pago",
-    key: "6",
+    key: "7",
     icon: "payments",
     route: "metodos-pago",
+  },
+  {
+    text: "Nuevas suscripciones",
+    key: "8",
+    icon: "content_paste_go",
+    route: "nuevas-suscripciones",
+  },
+  {
+    text: "Pagos suscripciones",
+    key: "9",
+    icon: "receipt_long",
+    route: "pagos-suscripciones",
   },
 ];
 

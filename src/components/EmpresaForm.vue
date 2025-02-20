@@ -405,7 +405,7 @@ const crearSubDominio = async () => {
     }
     console.log(empresaData.value);
     empresaForm.value?.validate().then(async (success) => {
-      /* if (success) {
+      if (success) {
         console.log("formulario validado", success);
         const { data } = await endpoint.createSubDominio({
           token,
@@ -416,7 +416,7 @@ const crearSubDominio = async () => {
         console.log(empresaData.value);
       } else {
         console.log("form no valido", success);
-      } */
+      }
     });
   } catch (e) {
     console.log(e);

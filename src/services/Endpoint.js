@@ -25,6 +25,9 @@ const Endpoint = {
   getUser({ path, body }) {
     return mainServer.post(url + `/users/${path}`, body);
   },
+  suscripciones({ path, body }) {
+    return mainServer.post(url + `/suscripciones/${path}`, body);
+  },
   planes({ path, body }) {
     return mainServer.post(url + `/planes/${path}`, body);
   },

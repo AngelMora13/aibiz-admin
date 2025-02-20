@@ -86,6 +86,11 @@ const routes = [
         name: "metodos-pago",
         component: () => import("src/pages/admin/MetodosPago.vue"),
       },
+      {
+        path: "nuevas-suscripciones",
+        name: "nuevas-suscripciones",
+        component: () => import("src/pages/admin/NuevasSuscripciones.vue"),
+      },
     ],
   },
 
