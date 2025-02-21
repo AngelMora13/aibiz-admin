@@ -91,6 +91,11 @@ const routes = [
         name: "nuevas-suscripciones",
         component: () => import("src/pages/admin/NuevasSuscripciones.vue"),
       },
+      {
+        path: "pagos-suscripciones",
+        name: "pagos-suscripciones",
+        component: () => import("src/pages/admin/PagosSuscripciones.vue"),
+      },
     ],
   },
 

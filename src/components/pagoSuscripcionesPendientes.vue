@@ -1,106 +1,112 @@
 <template>
-  <q-page class="gap-2 page-main overflow-auto">
-    <div>
-      <div class="row justify-center" style="max-width: 100%">
-        <q-table
-          class="col-12"
-          :columns="headers"
-          :rows="suscripciones"
-          flat
-          no-data-label="no hay datos disponibles"
-          loading-label="Buscando..."
-          rows-per-page-label="filas por pagina"
-          key="_id"
-          row-key="_id"
-          v-model:pagination="pagination"
-          @request="handleTableUpdate"
-          :loading="loader"
-        >
-          <template v-slot:top>
-            <div class="row" style="width: 100%">
-              <h2 class="col-4 texto-3 q-my-none">Nuevas Suscripciones</h2>
-            </div>
-          </template>
-          <template v-slot:body-cell-suscriptor="{ row }">
-            <q-td>
-              {{ row?.suscriptor?.nombre }}
-            </q-td>
-          </template>
-          <template v-slot:body-cell-razonSocial="{ row }">
-            <q-td>
-              {{ row?.empresa?.nombre }}
-            </q-td>
-          </template>
-          <template v-slot:body-cell-plan="{ row }">
-            <q-td v-if="row?.plan?.tipo === 'comercial'">
-              {{ row?.plan?.nombre }} (COM)
-            </q-td>
-            <q-td v-if="row?.plan?.tipo === 'contador'">
-              {{ row?.plan?.nombre }} (CON)
-            </q-td>
-          </template>
-          <template v-slot:body-cell-metodoPago="{ row }">
-            <q-td>
-              {{ metodosPagos[row?.metodoType] }}
-            </q-td>
-          </template>
-          <template v-slot:body-cell-banco="{ row }">
-            <q-td>
-              {{ row?.pago?.banco }}
-            </q-td>
-          </template>
-          <template v-slot:body-cell-referencia="{ row }">
-            <q-td>
-              {{ row?.pago?.referencia }}
-            </q-td>
-          </template>
-          <template v-slot:body-cell-fechaPago="{ row }">
-            <q-td>
-              {{ qDate(row?.pago?.fechaPago).format("DD-MM-YYYY") }}
-            </q-td>
-          </template>
-          <template v-slot:body-cell-acciones="{ row }">
-            <q-td style="text-align: center">
-              <q-btn icon="check_circle" unelevated @click="openForm(row)">
-                <q-tooltip
-                  anchor="top middle"
-                  self="bottom middle"
-                  :offset="[10, 10]"
-                >
-                  Activar Suscripción
-                </q-tooltip>
-              </q-btn>
-            </q-td>
-          </template>
-        </q-table>
-      </div>
-      <q-dialog v-model="openDialogForm" @keydown.esc="openDialogForm = false">
-        <q-card flat class="w-100" style="min-width: 800px">
-          <div class="row justify-end">
-            <q-btn
-              unelevated
-              icon="close"
-              @click="openDialogForm = false"
-            ></q-btn>
+  <div>
+    <div class="row justify-center" style="max-width: 100%">
+      <q-table
+        class="col-12"
+        :columns="headers"
+        :rows="suscripciones"
+        flat
+        no-data-label="no hay datos disponibles"
+        loading-label="Buscando..."
+        rows-per-page-label="filas por pagina"
+        key="_id"
+        row-key="_id"
+        v-model:pagination="pagination"
+        @request="handleTableUpdate"
+        :loading="loader"
+      >
+        <template v-slot:top>
+          <div class="row q-py-none q-my-none" style="width: 100%">
+            <h6 class="col-4 texto-3 q-my-none">Suscripciones Pendientes</h6>
           </div>
-          <newSuscriptionForm
-            :suscripcion-data="suscripcionData"
-            :loader-action="loaderActions"
-            @activar-suscripcion="activarSuscripcion"
-            @rechazar-solicitud="rechazarSolicitud"
-          />
-        </q-card>
-      </q-dialog>
+        </template>
+        <template v-slot:body-cell-suscriptor="{ row }">
+          <q-td>
+            {{ row?.suscriptor?.nombre }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-razonSocial="{ row }">
+          <q-td>
+            {{ row?.empresa?.nombre }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-cantidadPlanes="{ row }">
+          <q-td v-if="row?.dataSubDominio && row?.dataSubDominio?.cantPlanes">
+            {{ row?.dataSubDominio?.cantPlanes }}
+          </q-td>
+          <q-td v-else>
+            {{ row?.cantidad }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-plan="{ row }">
+          <q-td v-if="row?.plan?.tipo === 'comercial'">
+            {{ row?.plan?.nombre }} (COM)
+          </q-td>
+          <q-td v-if="row?.plan?.tipo === 'contador'">
+            {{ row?.plan?.nombre }} (CON)
+          </q-td>
+        </template>
+        <template v-slot:body-cell-metodoPago="{ row }">
+          <q-td>
+            {{ metodosPagos[row?.metodoType] }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-banco="{ row }">
+          <q-td>
+            {{ row?.pago?.banco }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-referencia="{ row }">
+          <q-td>
+            {{ row?.pago?.referencia }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-fechaPago="{ row }">
+          <q-td>
+            {{ qDate(row?.pago?.fechaPago).format("DD-MM-YYYY") }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-acciones="{ row }">
+          <q-td style="text-align: center">
+            <q-btn icon="check_circle" unelevated @click="openForm(row)">
+              <q-tooltip
+                anchor="top middle"
+                self="bottom middle"
+                :offset="[10, 10]"
+              >
+                Activar Suscripción
+              </q-tooltip>
+            </q-btn>
+          </q-td>
+        </template>
+      </q-table>
     </div>
-  </q-page>
+    <q-dialog v-model="openDialogForm" @keydown.esc="openDialogForm = false">
+      <q-card flat class="w-100" style="min-width: 800px">
+        <div class="row justify-end">
+          <q-btn
+            unelevated
+            icon="close"
+            @click="openDialogForm = false"
+          ></q-btn>
+        </div>
+        <newSuscriptionForm
+          :suscripcion-data="suscripcionData"
+          :loader-action="loaderActions"
+          @activar-suscripcion="activarSuscripcion"
+          @rechazar-solicitud="rechazarSolicitud"
+        />
+      </q-card>
+    </q-dialog>
+  </div>
 </template>
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import { qDate } from "src/utils/qDate";
 
-import endpoint from "../../services/Endpoint";
+import endpoint from "../services/Endpoint";
 import { useUserStore } from "stores/user-store";
-import Endpoint from "../../services/Endpoint";
+import Endpoint from "../services/Endpoint";
 import { debounce } from "quasar";
 import newSuscriptionForm from "src/components/newSuscriptionForm.vue";
 
@@ -222,7 +228,7 @@ const getSuscripciones = async () => {
   try {
     loader.value = true;
     const body = {
-      tipo: "suscripcion",
+      tipo: "pago",
       estado: "Pendiente",
       itemsPorPagina: pagination.value.rowsPerPage,
       pagina: pagination.value.page,
@@ -231,6 +237,7 @@ const getSuscripciones = async () => {
       body,
       path: "get",
     });
+    console.log({ data });
     suscripciones.value = data.suscripciones;
     pagination.value.rowsNumber = data.countSuscripciones || 0;
   } catch (e) {
@@ -255,26 +262,13 @@ const openForm = (item) => {
 };
 const activarSuscripcion = async ($event) => {
   console.log($event);
-  $event.modulosId = [];
-  for (const modulosPlan of $event?.plan?.modulos) {
-    if (!modulosPlan?.activo) continue;
-    if (modulosPlan.modulos && modulosPlan.modulos[0]) {
-      for (const modulo of modulosPlan.modulos) {
-        const keyModulo = listOfModules.value.find((e) => e.nombre === modulo);
-        const indexKey = $event?.modulosId?.findIndex(
-          (e) => e === keyModulo.key,
-        );
-        if (indexKey === -1) $event.modulosId.push(keyModulo.key);
-      }
-    }
-  }
   try {
     const body = {
       ...$event,
     };
     const { data } = await Endpoint.suscripciones({
       body,
-      path: "create/newDominio",
+      path: "update/pagosSuscripciones",
     });
     getSuscripciones();
     openDialogForm.value = false;
@@ -311,17 +305,9 @@ const handleTableUpdate = (props) => {
   const { page, rowsPerPage } = props.pagination;
   pagination.value.page = page;
   pagination.value.rowsPerPage = rowsPerPage;
-  return getSuscripciones();
+  return;
+  getSuscripciones();
 };
-watch(
-  () => openDeleteBanco.value,
-  (value) => {
-    if (!value) {
-      suscripcionData.value = null;
-    }
-  },
-  { deep: true },
-);
 watch(
   () => openDialogForm.value,
   (value) => {

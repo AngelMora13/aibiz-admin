@@ -59,4 +59,21 @@ const momentDate = (...args) => {
   };
   return new qDate(...args);
 };
-export { qDate, momentDate };
+const momentDateFull = (...args) => {
+  const timeZone = "America/Caracas";
+
+  const momentDate = class {
+    constructor(fecha, format, strict = false, formatOptonal) {
+      this.fecha = moment.tz(fecha, format, strict, timeZone);
+      if (formatOptonal && !this.isValid) {
+        this.fecha = moment.tz(fecha, null, timeZone);
+      }
+    }
+  };
+  /**
+   * @param {boolean=} withTime - Retorna el formato con fecha
+   */
+  const clientDate = new momentDate(...args);
+  return clientDate.fecha;
+};
+export { qDate, momentDate, momentDateFull };

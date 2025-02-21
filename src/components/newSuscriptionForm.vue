@@ -230,6 +230,7 @@
         unelevated
         color="negative"
         class="q-mt-md text-capitalize"
+        @click="rechazarSolicitud"
         >Rechazar
       </q-btn>
       <q-btn
@@ -238,14 +239,14 @@
         unelevated
         color="secondary"
         class="q-mt-md text-capitalize"
-        >Activar
+        >Aprobar
       </q-btn>
     </div>
   </q-form>
 </template>
 
 <script setup>
-import { qDate } from "src/utils/qDate";
+import { momentDateFull, qDate } from "src/utils/qDate";
 import { ref, onMounted, defineProps, defineEmits, watch } from "vue";
 import { tiposPlanes } from "src/constants/magicString";
 const props = defineProps({
@@ -257,7 +258,7 @@ const props = defineProps({
     type: Boolean,
   },
 });
-const emit = defineEmits(["activar-suscripcion"]);
+const emit = defineEmits(["activar-suscripcion", "rechazar-solicitud"]);
 const suscripcion = ref({});
 const empresaForm = ref(null);
 const empresaData = ref({});
@@ -267,32 +268,80 @@ const laoderRechazar = ref(false);
 onMounted(() => {
   suscripcion.value = props.suscripcionData;
   empresaData.value = {
-    razonSocial: props.suscripcionData?.empresa?.nombre,
+    razonSocial:
+      props.suscripcionData?.dataSubDominio?.razonSocial ||
+      props.suscripcionData?.empresa?.nombre,
     suscriptor: props.suscripcionData?.suscriptor?.nombre,
     telefono: props.suscripcionData?.empresa?.telefono,
-    tipoDocumento: props.suscripcionData?.empresa?.tipoDocumento,
+    tipoDocumento:
+      props.suscripcionData?.dataSubDominio?.tipoDocumento ||
+      props.suscripcionData?.empresa?.tipoDocumento,
     documentoIdentidad:
+      props.suscripcionData?.dataSubDominio?.tipoDocumento +
+        props.suscripcionData?.dataSubDominio?.documentoIdentidad ||
       props.suscripcionData?.empresa?.tipoDocumento +
-      props.suscripcionData?.empresa?.documentoIdentidad,
+        props.suscripcionData?.empresa?.documentoIdentidad,
     subdominio: props.suscripcionData?.subdominio,
     plan: `${props.suscripcionData?.plan?.nombre} (${
       tiposPlanes[props.suscripcionData?.plan?.tipo]
     })`,
-    cantidad: props.suscripcionData?.cantidad,
+    cantidad:
+      props.suscripcionData?.dataSubDominio?.cantPlanes ||
+      props.suscripcionData?.cantidad,
     meses: props.suscripcionData?.meses,
-    nombreRepresentante: props.suscripcionData?.empresa?.nombreRepresentante,
+    nombreRepresentante:
+      props.suscripcionData?.dataSubDominio?.nombreRepresentante ||
+      props.suscripcionData?.empresa?.nombreRepresentante,
     documentoIdentidadRepresentante:
+      props.suscripcionData?.dataSubDominio?.tipoDocumentoRepresentante +
+        props.suscripcionData?.dataSubDominio
+          ?.documentoIdentidadRepresentante ||
       props.suscripcionData?.empresa?.tipoDocumentoRepresentante +
-      props.suscripcionData?.empresa?.documentoIdentidadRepresentante,
-    direccion: props.suscripcionData?.empresa?.direccion,
-    newFechaVencimiento: qDate()
+        props.suscripcionData?.empresa?.documentoIdentidadRepresentante,
+    direccion:
+      props.suscripcionData?.dataSubDominio?.direccion ||
+      props.suscripcionData?.empresa?.direccion,
+    /*newFechaVencimiento: qDate()
       .add(props.suscripcionData?.meses, "month")
-      .format("DD-MM-YYYY"),
+      .format("DD-MM-YYYY"),*/
   };
+  if (!props.suscripcionData?.dataSubDominio?.fechaVencimiento)
+    empresaData.value.newFechaVencimiento = qDate()
+      .add(props.suscripcionData?.meses, "month")
+      .format("YYYY-MM-DD");
+  else if (
+    momentDateFull(props.suscripcionData?.dataSubDominio?.fechaVencimiento)
+      .endOf("day")
+      .isSameOrBefore(momentDateFull())
+  ) {
+    console.log("fecha vencida");
+    empresaData.value.newFechaVencimiento = momentDateFull()
+      .add(props.suscripcionData?.meses, "month")
+      .format("YYYY-MM-DD");
+    suscripcion.value.newFechaVencimiento =
+      empresaData.value.newFechaVencimiento;
+  } else {
+    console.log("fecha no vencida");
+    empresaData.value.newFechaVencimiento = momentDateFull(
+      props.suscripcionData?.dataSubDominio?.fechaVencimiento,
+    )
+      .endOf("day")
+      .add(props.suscripcionData?.meses, "month")
+      .format("YYYY-MM-DD");
+  }
+  suscripcion.value.newFechaVencimiento = momentDateFull(
+    props.suscripcionData?.dataSubDominio?.fechaVencimiento,
+  )
+    .endOf("day")
+    .add(props.suscripcionData?.meses, "month");
 });
 function activarSuscripcion() {
   loaderCreate.value = true;
   emit("activar-suscripcion", suscripcion.value);
+}
+function rechazarSolicitud() {
+  laoderRechazar.value = true;
+  emit("rechazar-solicitud", suscripcion.value);
 }
 watch(
   () => props.loaderAction,
@@ -301,6 +350,6 @@ watch(
       loaderCreate.value = false;
       laoderRechazar.value = false;
     }
-  }
+  },
 );
 </script>

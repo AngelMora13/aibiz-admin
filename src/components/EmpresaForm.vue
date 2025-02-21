@@ -86,6 +86,7 @@
           outlined
           suffix=".aibiz.com"
           color="primary"
+          :disable="formType === 'editar'"
           :rules="rules.requeridos"
         >
           <template v-slot:prepend>
@@ -352,6 +353,7 @@ const empresaData = computed({
 });
 const isFormValid = ref(false);
 onMounted(() => {
+  console.log({ props: props.empresa });
   if (props.formType === "editar") {
     empresaForm.value?.validate().then((success) => {
       if (success) isFormValid.value = success;
@@ -392,11 +394,11 @@ const crearSubDominio = async () => {
       if (modulosPlan.modulos && modulosPlan.modulos[0]) {
         for (const modulo of modulosPlan.modulos) {
           const keyModulo = listOfModules.value.find(
-            (e) => e.nombre === modulo
+            (e) => e.nombre === modulo,
           );
           console.log({ keyModulo });
           const indexKey = empresaData.value?.modulosId?.findIndex(
-            (e) => e === keyModulo.key
+            (e) => e === keyModulo.key,
           );
           console.log({ indexKey });
           if (indexKey === -1) empresaData.value.modulosId.push(keyModulo.key);
@@ -465,7 +467,7 @@ watch(
       isFormValid.value = success;
     });
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => empresaData.value,
@@ -476,7 +478,7 @@ watch(
       empresaData.value.fechaVencimiento = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 </script>
 <style>

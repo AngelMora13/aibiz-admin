@@ -120,6 +120,7 @@ import { useUserStore } from "stores/user-store";
 import endpoint from "../../services/Endpoint";
 import EmpresaForm from "src/components/EmpresaForm.vue";
 import SearchInput from "src/components/SearchInput.vue";
+import { momentDateFull } from "src/utils/qDate";
 
 const userStore = useUserStore();
 const searchInput = ref("");
@@ -163,7 +164,7 @@ const empresasList = computed({
         emp.subDominio
           ?.toLowerCase()
           .includes(searchInput.value.toLowerCase()) ||
-        emp.telefono?.toLowerCase().includes(searchInput.value.toLowerCase())
+        emp.telefono?.toLowerCase().includes(searchInput.value.toLowerCase()),
     );
   },
 });
@@ -229,16 +230,20 @@ const getSubDominios = async () => {
   }
 };
 const handleEditform = (empresa) => {
+  console.log(empresa, 1);
   formType.value = "editar";
-  const tipoDocumento = empresa.documentoIdentidad.slice(0, 1);
-  const documentoIdentidad = empresa.documentoIdentidad.slice(1);
+  const tipoDocumento = empresa.tipoDocumento.slice(0, 1);
+  const documentoIdentidad = empresa.documentoIdentidad;
   empresaFormData.value = {
     ...empresa,
     tipoDocumento: tipoDocumento,
     documentoIdentidad: documentoIdentidad,
     modulos: empresa.modulosId || [],
+    cantMeses: 0,
+    newFechaVencimiento: momentDateFull(empresa.fechaVencimiento).format(
+      "YYYY-MM-DD",
+    ),
   };
-  console.log(empresa.modulos, empresa.modulosId);
   openFormEmpresa.value = true;
 };
 const handleSubmit = async () => {
@@ -320,7 +325,7 @@ watch(
       accionAlert.value = "";
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openFormEmpresa.value,
@@ -329,7 +334,7 @@ watch(
       formType.value = "crear";
       empresaFormData.value = { ...empresaFormDataDefault.value };
     }
-  }
+  },
 );
 </script>
 <style scoped>
