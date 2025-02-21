@@ -51,7 +51,7 @@ export default defineConfig((ctx) => {
       // env: ctx.dev ? require("dotenv").config().parsed : process.env,
       env: process.env,
       target: {
-        browser: ["ES2022", "edge88", "firefox78", "chrome87", "safari13.1"],
+        browser: ["es2019", "edge88", "firefox78", "chrome87", "safari13.1"],
         node: "node22",
       },
       VueApiEndpoint: process.env.VUE_API_ENDPOINT,
