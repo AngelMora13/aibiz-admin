@@ -113,8 +113,6 @@
 </template>
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
-import { qDate } from "src/utils/qDate";
-import XLSX from "xlsx";
 
 import endpoint from "../../services/Endpoint";
 import { useUserStore } from "stores/user-store";
@@ -233,7 +231,7 @@ const deleteBanco = async () => {
       path: "delete",
     });
     const index1 = bancosList.value.findIndex(
-      (e) => e._id === bancoData.value._id
+      (e) => e._id === bancoData.value._id,
     );
     if (index1 !== -1) {
       bancosList.value.splice(index1, 1);
@@ -272,7 +270,7 @@ const filterFn = (val, update) => {
   update(() => {
     const needle = val.toLowerCase();
     listContryOptions.value = listContry.value.filter(
-      (v) => v.name.toLowerCase().indexOf(needle) > -1
+      (v) => v.name.toLowerCase().indexOf(needle) > -1,
     );
   });
 };
@@ -283,7 +281,7 @@ watch(
       bancoData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openFormBanco.value,
@@ -292,13 +290,13 @@ watch(
       bancoData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   filtros.value,
   debounce((value) => {
     getListBancos();
-  }, 500)
+  }, 500),
 );
 </script>
 <style scoped>
