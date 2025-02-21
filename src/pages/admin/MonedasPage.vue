@@ -136,9 +136,8 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import { qDate } from "src/utils/qDate";
-import XLSX from "xlsx";
+import XLSX from "xlsx-js-style";
 
-import endpoint from "../../services/Endpoint";
 import { useUserStore } from "stores/user-store";
 import FormMoneda from "src/components/FormMoneda.vue";
 import Endpoint from "../../services/Endpoint";
@@ -279,11 +278,11 @@ const handleSaveFile = async () => {
           index++;
           tasa.fechaOperacion = qDate(
             row.B.replace("Fecha Operacion: ", ""),
-            "DD/MM/YYYY"
+            "DD/MM/YYYY",
           ).toDate;
           tasa.fechaValor = qDate(
             row.D.replace("Fecha Valor: ", ""),
-            "DD/MM/YYYY"
+            "DD/MM/YYYY",
           ).toDate;
           tasa.fechaUpdate = row.D.replace("Fecha Valor: ", "");
           continue;
@@ -411,7 +410,7 @@ watch(
       monedaData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openDeleteMoneda.value,
@@ -420,7 +419,7 @@ watch(
       monedaData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 </script>
 <style scoped>

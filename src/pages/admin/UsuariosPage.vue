@@ -91,7 +91,7 @@
 </template>
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
-import { date, Quasar } from "quasar";
+import { date } from "quasar";
 
 import endpoint from "../../services/Endpoint";
 import SearchInput from "src/components/SearchInput.vue";

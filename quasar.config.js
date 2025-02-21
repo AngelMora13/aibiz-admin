@@ -8,9 +8,9 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
-const { configure } = require("quasar/wrappers");
+import { defineConfig } from "#q-app/wrappers";
 
-module.exports = configure(function (ctx) {
+export default defineConfig((ctx) => {
   return {
     eslint: {
       // fix: true,
@@ -48,10 +48,11 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
-      env: ctx.dev ? require("dotenv").config().parsed : process.env,
+      // env: ctx.dev ? require("dotenv").config().parsed : process.env,
+      env: process.env,
       target: {
-        browser: ["es2019", "edge88", "firefox78", "chrome87", "safari13.1"],
-        node: "node16",
+        browser: ["ES2022", "edge88", "firefox78", "chrome87", "safari13.1"],
+        node: "node22",
       },
       VueApiEndpoint: process.env.VUE_API_ENDPOINT,
       vueRouterMode: process.env.VUE_ROUTER_MODE, // available values: 'hash', 'history'

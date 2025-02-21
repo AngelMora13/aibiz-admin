@@ -96,11 +96,9 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import { qDate } from "src/utils/qDate";
-import XLSX from "xlsx";
 
 import endpoint from "../../services/Endpoint";
 import { useUserStore } from "stores/user-store";
-import FormBancos from "src/components/formBancos.vue";
 import Endpoint from "../../services/Endpoint";
 import { debounce } from "quasar";
 import newSuscriptionForm from "src/components/newSuscriptionForm.vue";
@@ -263,7 +261,7 @@ const activarSuscripcion = async ($event) => {
       for (const modulo of modulosPlan.modulos) {
         const keyModulo = listOfModules.value.find((e) => e.nombre === modulo);
         const indexKey = $event?.modulosId?.findIndex(
-          (e) => e === keyModulo.key
+          (e) => e === keyModulo.key,
         );
         if (indexKey === -1) $event.modulosId.push(keyModulo.key);
       }
@@ -304,7 +302,7 @@ const deleteBanco = async () => {
       path: "delete",
     });
     const index1 = suscripciones.value.findIndex(
-      (e) => e._id === suscripcionData.value._id
+      (e) => e._id === suscripcionData.value._id,
     );
     if (index1 !== -1) {
       suscripciones.value.splice(index1, 1);
@@ -343,7 +341,7 @@ const filterFn = (val, update) => {
   update(() => {
     const needle = val.toLowerCase();
     listContryOptions.value = listContry.value.filter(
-      (v) => v.name.toLowerCase().indexOf(needle) > -1
+      (v) => v.name.toLowerCase().indexOf(needle) > -1,
     );
   });
 };
@@ -354,7 +352,7 @@ watch(
       suscripcionData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openDialogForm.value,
@@ -363,13 +361,13 @@ watch(
       suscripcionData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   filtros.value,
   debounce((value) => {
     getSuscripciones();
-  }, 500)
+  }, 500),
 );
 </script>
 <style scoped>

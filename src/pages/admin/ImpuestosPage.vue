@@ -452,9 +452,7 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
 import { qDate } from "src/utils/qDate";
-import XLSX from "xlsx";
 
-import endpoint from "../../services/Endpoint";
 import { useUserStore } from "stores/user-store";
 import FormIva from "src/components/IvaForm.vue";
 import formRetIva from "src/components/formRetIva.vue";
@@ -868,7 +866,7 @@ const deleteIslr = async () => {
       path: "delete/islr",
     });
     const index1 = islrList.value.findIndex(
-      (e) => e._id === islrData.value._id
+      (e) => e._id === islrData.value._id,
     );
     if (index1 !== -1) {
       islrList.value.splice(index1, 1);
@@ -945,7 +943,7 @@ const deleteRetIva = async () => {
       path: "delete/retIva",
     });
     const index1 = retIvaList.value.findIndex(
-      (e) => e._id === retIvaData.value._id
+      (e) => e._id === retIvaData.value._id,
     );
     if (index1 !== -1) {
       retIvaList.value.splice(index1, 1);
@@ -1031,7 +1029,7 @@ const deleteCiclo = async () => {
       path: "delete/ciclosImpuestos",
     });
     const index1 = ciclosList.value.findIndex(
-      (e) => e._id === itemCiclo.value._id
+      (e) => e._id === itemCiclo.value._id,
     );
     if (index1 !== -1) {
       ciclosList.value.splice(index1, 1);
@@ -1056,7 +1054,7 @@ const filterFn = (val, update) => {
   update(() => {
     const needle = val.toLowerCase();
     listContryOptions.value = listContry.value.filter(
-      (v) => v.name.toLowerCase().indexOf(needle) > -1
+      (v) => v.name.toLowerCase().indexOf(needle) > -1,
     );
   });
 };
@@ -1067,7 +1065,7 @@ watch(
       retIvaData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openFormRetIva.value,
@@ -1076,7 +1074,7 @@ watch(
       retIvaData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openDeleteIva.value,
@@ -1085,7 +1083,7 @@ watch(
       ivaData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openDialogDeleteIslr.value,
@@ -1094,7 +1092,7 @@ watch(
       islrData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openFormIva.value,
@@ -1103,7 +1101,7 @@ watch(
       ivaData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openFormIslr.value,
@@ -1112,7 +1110,7 @@ watch(
       islrData.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openCicloImpuesto.value,
@@ -1121,25 +1119,25 @@ watch(
       itemCiclo.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   pais,
   debounce((value) => {
     getListIva();
-  }, 500)
+  }, 500),
 );
 watch(
   paisIslr,
   debounce((value) => {
     getListIslr();
-  }, 500)
+  }, 500),
 );
 watch(
   paisRetencionIva,
   debounce((value) => {
     getListRetIva();
-  }, 500)
+  }, 500),
 );
 </script>
 <style scoped>
