@@ -65,7 +65,7 @@
         </template>
         <template v-slot:body-cell-acciones="props">
           <q-td :props="props">
-            <q-btn flat round color="secondary" icon="attachment"></q-btn>
+            <!--<q-btn flat round color="secondary" icon="attachment"></q-btn>-->
             <q-btn
               flat
               round
@@ -246,11 +246,11 @@ const handleEditform = (empresa) => {
   };
   openFormEmpresa.value = true;
 };
-const handleSubmit = async () => {
+const handleSubmit = async ($event) => {
   try {
     if (formType.value === "crear")
       return console.log("recuerda agregar el crear");
-    else await updateEmpresa();
+    else await updateEmpresa($event);
   } catch (e) {
     console.log(e);
   } finally {
@@ -258,10 +258,11 @@ const handleSubmit = async () => {
     getSubDominios();
   }
 };
-const updateEmpresa = async () => {
+const updateEmpresa = async ($event) => {
   console.log("editando ando");
-  empresaFormData.value.documentoIdentidad = `${empresaFormData.value.tipoDocumento}${empresaFormData.value.documentoIdentidad}`;
-  await endpoint.updateEmpresa(empresaFormData.value);
+  // empresaFormData.value.documentoIdentidad = `${empresaFormData.value.tipoDocumento}${empresaFormData.value.documentoIdentidad}`;
+  console.log({ e: $event });
+  await endpoint.updateEmpresa($event);
 };
 const disabledEmpresa = async () => {
   console.log("desactivar", empresaFormData.value);

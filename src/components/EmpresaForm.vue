@@ -220,7 +220,7 @@
             color="primary"
             class="text-capitalize"
             :disable="!isFormValid"
-            @click="emit('submit')"
+            @click="editarEmpresa"
           >
             Guardar
           </q-btn>
@@ -383,13 +383,36 @@ const getModules = async () => {
     console.log(e);
   }
 };
+const editarEmpresa = () => {
+  empresaData.value.email = empresaData.value?.suscriptor?.email;
+  asignarModulosPorPlan();
+  emit("submit", empresaData.value);
+};
+const asignarModulosPorPlan = () => {
+  empresaData.value.modulosId = [];
+  for (const modulosPlan of empresaData.value?.plan?.modulos) {
+    if (!modulosPlan?.activo) continue;
+    if (modulosPlan.modulos && modulosPlan.modulos[0]) {
+      for (const modulo of modulosPlan.modulos) {
+        const keyModulo = listOfModules.value.find((e) => e.nombre === modulo);
+        //console.log({ keyModulo });
+        const indexKey = empresaData.value?.modulosId?.findIndex(
+          (e) => e === keyModulo.key,
+        );
+        //console.log({ indexKey });
+        if (indexKey === -1) empresaData.value.modulosId.push(keyModulo.key);
+      }
+    }
+  }
+};
 const crearSubDominio = async () => {
   try {
     const token = userStore.$state.token;
     empresaData.value.documentoIdentidad = `${empresaData.value.tipoDocumento}${empresaData.value.documentoIdentidad}`;
     empresaData.value.email = empresaData.value?.suscriptor?.email;
-    empresaData.value.modulosId = [];
-    for (const modulosPlan of empresaData.value?.plan?.modulos) {
+    asignarModulosPorPlan();
+    //empresaData.value.modulosId = [];
+    /* for (const modulosPlan of empresaData.value?.plan?.modulos) {
       if (!modulosPlan?.activo) continue;
       if (modulosPlan.modulos && modulosPlan.modulos[0]) {
         for (const modulo of modulosPlan.modulos) {
@@ -404,7 +427,7 @@ const crearSubDominio = async () => {
           if (indexKey === -1) empresaData.value.modulosId.push(keyModulo.key);
         }
       }
-    }
+    } */
     console.log(empresaData.value);
     empresaForm.value?.validate().then(async (success) => {
       if (success) {
