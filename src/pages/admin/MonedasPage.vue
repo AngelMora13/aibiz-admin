@@ -78,7 +78,9 @@
         >
           <template v-slot:body-cell-fechaValor="{ row }">
             <td>
-              {{ qDate(row.fechaValor).format("DD-MM-YYYY") }}
+              {{
+                row.fechaUpdate /*qDate(row.fechaValor).format("DD-MM-YYYY")*/
+              }}
             </td>
           </template>
           <template v-slot:body-cell-acciones="{ row }">
@@ -388,6 +390,7 @@ const getTasasBancarias = async () => {
       path: "getTasas",
       body,
     });
+    console.log({ data });
     tasasBancarias.value = data.tasas || [];
     paginationTasas.value.rowsNumber = data.cantidad || 0;
   } catch (e) {

@@ -1,6 +1,6 @@
 <template>
   <q-card flat>
-    <q-card-section>
+    <q-card-section v-if="suscripcion?.metodoType">
       <div class="row">
         <div class="col-6" v-if="suscripcion?.metodoType === 'transferencia'">
           <div class="text-h6 text-secondary">Método de Pago</div>
@@ -286,8 +286,8 @@ onMounted(() => {
       tiposPlanes[props.suscripcionData?.plan?.tipo]
     })`,
     cantidad:
-      props.suscripcionData?.dataSubDominio?.cantPlanes ||
-      props.suscripcionData?.cantidad,
+      props.suscripcionData?.cantidad ||
+      props.suscripcionData?.dataSubDominio?.cantPlanes,
     meses: props.suscripcionData?.meses,
     nombreRepresentante:
       props.suscripcionData?.dataSubDominio?.nombreRepresentante ||

@@ -14,7 +14,9 @@
       <q-tab-panel name="pagos">
         <pagoSuscripcionesPendientes />
       </q-tab-panel>
-      <q-tab-panel name="modifcaciones"> </q-tab-panel>
+      <q-tab-panel name="modifcaciones">
+        <modificacionesSuscripcionesPendientes />
+      </q-tab-panel>
     </q-tab-panels>
   </q-page>
 </template>
@@ -28,6 +30,7 @@ import Endpoint from "../../services/Endpoint";
 import { debounce } from "quasar";
 import newSuscriptionForm from "src/components/newSuscriptionForm.vue";
 import pagoSuscripcionesPendientes from "src/components/pagoSuscripcionesPendientes.vue";
+import modificacionesSuscripcionesPendientes from "src/components/modificacionesSuscripcionesPendientes.vue";
 
 const userStore = useUserStore();
 const tab = ref("pagos");

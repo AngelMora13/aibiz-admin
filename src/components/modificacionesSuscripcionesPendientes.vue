@@ -31,11 +31,11 @@
           </q-td>
         </template>
         <template v-slot:body-cell-cantidadPlanes="{ row }">
-          <q-td v-if="row?.dataSubDominio && row?.dataSubDominio?.cantPlanes">
-            {{ row?.dataSubDominio?.cantPlanes }}
+          <q-td v-if="row?.cantidad">
+            {{ row?.cantidad }}
           </q-td>
           <q-td v-else>
-            {{ row?.cantidad }}
+            {{ row?.dataSubDominio?.cantPlanes }}
           </q-td>
         </template>
         <template v-slot:body-cell-plan="{ row }">
@@ -173,14 +173,6 @@ const headers = computed(() => {
       sortable: false,
     },
     {
-      name: "cantidadMeses",
-      align: "left",
-      label: "Cant.Meses",
-      field: "meses",
-      headerStyle: "width: 35px; white-space: normal",
-      sortable: false,
-    },
-    {
       name: "metodoPago",
       align: "left",
       label: "Metodo de Pago",
@@ -228,7 +220,7 @@ const getSuscripciones = async () => {
   try {
     loader.value = true;
     const body = {
-      tipo: "pago",
+      tipo: "cambio",
       estado: "Pendiente",
       itemsPorPagina: pagination.value.rowsPerPage,
       pagina: pagination.value.page,
@@ -262,6 +254,19 @@ const openForm = (item) => {
 };
 const activarSuscripcion = async ($event) => {
   console.log($event);
+  $event.modulosId = [];
+  for (const modulosPlan of $event?.plan?.modulos) {
+    if (!modulosPlan?.activo) continue;
+    if (modulosPlan.modulos && modulosPlan.modulos[0]) {
+      for (const modulo of modulosPlan.modulos) {
+        const keyModulo = listOfModules.value.find((e) => e.nombre === modulo);
+        const indexKey = $event?.modulosId?.findIndex(
+          (e) => e === keyModulo.key,
+        );
+        if (indexKey === -1) $event.modulosId.push(keyModulo.key);
+      }
+    }
+  }
   try {
     const body = {
       ...$event,
