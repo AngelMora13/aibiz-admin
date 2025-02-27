@@ -17,7 +17,7 @@
       >
         <template v-slot:top>
           <div class="row q-py-none q-my-none" style="width: 100%">
-            <h6 class="col-4 texto-3 q-my-none">Suscripciones Pendientes</h6>
+            <h6 class="col-4 texto-3 q-my-none">Historial de Modificaciones</h6>
           </div>
         </template>
         <template v-slot:body-cell-suscriptor="{ row }">
@@ -195,6 +195,13 @@ const headers = computed(() => {
       sortable: false,
     },
     {
+      name: "estado",
+      align: "left",
+      label: "Estado",
+      field: "estado",
+      sortable: false,
+    },
+    {
       name: "fechaSolicitud",
       align: "left",
       label: "Fecha de Solicitud",
@@ -221,7 +228,7 @@ const getSuscripciones = async () => {
     loader.value = true;
     const body = {
       tipo: "cambio",
-      estado: "Pendiente",
+      estado: "historial",
       itemsPorPagina: pagination.value.rowsPerPage,
       pagina: pagination.value.page,
     };

@@ -170,61 +170,122 @@
           </template>
         </q-input>
       </div>
-      <div class="col-5 column q-py-xs">
-        <p style="font-size: 10px; margin: 0">Plan</p>
-        <q-input
-          v-model="empresaData.plan"
-          class="col-5 q-pr-sm"
-          placeholder="Planes"
-          dense
-          outlined
-          readonly
-        >
-          <template v-slot:prepend>
-            <q-icon name="description" color="secondary" />
-          </template>
-        </q-input>
+      <div class="row col-12 q-py-none" v-if="suscripcion.tipo !== 'cambio'">
+        <div class="col-5 column q-py-xs">
+          <p style="font-size: 10px; margin: 0">Plan</p>
+          <q-input
+            v-model="empresaData.plan"
+            class="col-5 q-pr-sm"
+            placeholder="Planes"
+            dense
+            outlined
+            readonly
+          >
+            <template v-slot:prepend>
+              <q-icon name="description" color="secondary" />
+            </template>
+          </q-input>
+        </div>
+        <div class="col-1 column q-px-none q-py-xs">
+          <p style="font-size: 10px; margin: 0">Cant. Planes</p>
+          <q-input
+            v-model="empresaData.cantidad"
+            type="number"
+            min="1"
+            outlined
+            dense
+            style="width: 60px"
+            readonly
+          ></q-input>
+        </div>
+        <div class="col-1 column q-pa-none q-py-xs">
+          <p style="font-size: 10px; margin: 0">Cant. Meses</p>
+          <q-input
+            v-model="empresaData.meses"
+            type="number"
+            min="1"
+            outlined
+            dense
+            style="width: 60px"
+            readonly
+          ></q-input>
+        </div>
+        <div class="col-5 column q-px-none q-py-xs">
+          <p style="font-size: 10px; margin: 0">Fecha de Vencimiento</p>
+          <q-input
+            v-model="empresaData.newFechaVencimiento"
+            dense
+            outlined
+            color="secondary"
+            readonly
+          >
+            <template v-slot:prepend>
+              <q-icon name="event" color="secondary" />
+            </template>
+          </q-input>
+        </div>
       </div>
-      <div class="col-1 column q-px-none q-py-xs">
-        <p style="font-size: 10px; margin: 0">Cant. Planes</p>
-        <q-input
-          v-model="empresaData.cantidad"
-          type="number"
-          min="1"
-          outlined
-          dense
-          style="width: 60px"
-          readonly
-        ></q-input>
-      </div>
-      <div class="col-1 column q-pa-none q-py-xs">
-        <p style="font-size: 10px; margin: 0">Cant. Meses</p>
-        <q-input
-          v-model="empresaData.meses"
-          type="number"
-          min="1"
-          outlined
-          dense
-          style="width: 60px"
-          readonly
-        ></q-input>
-      </div>
-      <div class="col-5 column q-px-none q-py-xs">
-        <p style="font-size: 10px; margin: 0">Fecha de Vencimiento</p>
-        <q-input
-          v-model="empresaData.newFechaVencimiento"
-          dense
-          outlined
-          color="secondary"
-          readonly
-        >
-          <template v-slot:prepend>
-            <q-icon name="event" color="secondary" />
-          </template>
-        </q-input>
+      <div class="row col-12 q-py-none" v-else>
+        <div class="col-5 column q-py-xs">
+          <p style="font-size: 10px; margin: 0">Plan Anterior</p>
+          <q-input
+            v-model="empresaData.planAnterior"
+            class="col-5 q-pr-sm"
+            placeholder="Planes"
+            dense
+            outlined
+            readonly
+          >
+            <template v-slot:prepend>
+              <q-icon name="description" color="secondary" />
+            </template>
+          </q-input>
+        </div>
+        <div class="col-1 column q-px-none q-py-xs">
+          <p style="font-size: 10px; margin: 0">Cant. Ant</p>
+          <q-input
+            v-model="empresaData.cantidadAnterior"
+            type="number"
+            min="1"
+            outlined
+            dense
+            style="width: 60px"
+            readonly
+          ></q-input>
+        </div>
+        <div class="col-5 column q-py-xs">
+          <p style="font-size: 10px; margin: 0">Plan</p>
+          <q-input
+            v-model="empresaData.plan"
+            class="col-5 q-pr-sm"
+            placeholder="Planes"
+            dense
+            outlined
+            readonly
+          >
+            <template v-slot:prepend>
+              <q-icon name="description" color="secondary" />
+            </template>
+          </q-input>
+        </div>
+        <div class="col-1 column q-px-none q-py-xs">
+          <p style="font-size: 10px; margin: 0">Cant. Planes</p>
+          <q-input
+            v-model="empresaData.cantidad"
+            type="number"
+            min="1"
+            outlined
+            dense
+            style="width: 60px"
+            readonly
+          ></q-input>
+        </div>
       </div>
     </div>
-    <div class="col-12 flex justify-between">
+    <div
+      class="col-12 flex justify-between"
+      v-if="suscripcion?.estado === 'Pendiente'"
+    >
       <q-btn
         :loading="laoderRechazar"
         unelevated
@@ -285,9 +346,15 @@ onMounted(() => {
     plan: `${props.suscripcionData?.plan?.nombre} (${
       tiposPlanes[props.suscripcionData?.plan?.tipo]
     })`,
+    planAnterior: props.suscripcionData?.planAnterior?.nombre
+      ? `${props.suscripcionData?.planAnterior?.nombre} (${
+          tiposPlanes[props.suscripcionData?.planAnterior?.tipo]
+        })`
+      : "",
     cantidad:
       props.suscripcionData?.cantidad ||
       props.suscripcionData?.dataSubDominio?.cantPlanes,
+    cantidadAnterior: props.suscripcionData?.cantidadAnterior,
     meses: props.suscripcionData?.meses,
     nombreRepresentante:
       props.suscripcionData?.dataSubDominio?.nombreRepresentante ||

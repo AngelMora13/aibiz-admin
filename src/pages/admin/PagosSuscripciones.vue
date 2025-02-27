@@ -12,10 +12,44 @@
     </q-tabs>
     <q-tab-panels v-model="tab" class="w-100">
       <q-tab-panel name="pagos">
-        <pagoSuscripcionesPendientes />
+        <q-tabs
+          v-model="tabPagos"
+          class="w-100"
+          align="left"
+          dense
+          active-color="secondary"
+        >
+          <q-tab name="pendientes" label="Pendientes" />
+          <q-tab name="historial" label="Historial" />
+        </q-tabs>
+        <q-tab-panels v-model="tabPagos" class="w-100">
+          <q-tab-panel name="pendientes">
+            <pagoSuscripcionesPendientes />
+          </q-tab-panel>
+          <q-tab-panel name="historial">
+            <PagosHistorial />
+          </q-tab-panel>
+        </q-tab-panels>
       </q-tab-panel>
       <q-tab-panel name="modifcaciones">
-        <modificacionesSuscripcionesPendientes />
+        <q-tabs
+          v-model="tabModificaciones"
+          class="w-100"
+          align="left"
+          dense
+          active-color="secondary"
+        >
+          <q-tab name="pendientes" label="Pendientes" />
+          <q-tab name="historial" label="Historial" />
+        </q-tabs>
+        <q-tab-panels v-model="tabModificaciones" class="w-100">
+          <q-tab-panel name="pendientes">
+            <modificacionesSuscripcionesPendientes />
+          </q-tab-panel>
+          <q-tab-panel name="historial">
+            <ModificacionesHistorial />
+          </q-tab-panel>
+        </q-tab-panels>
       </q-tab-panel>
     </q-tab-panels>
   </q-page>
@@ -31,9 +65,13 @@ import { debounce } from "quasar";
 import newSuscriptionForm from "src/components/newSuscriptionForm.vue";
 import pagoSuscripcionesPendientes from "src/components/pagoSuscripcionesPendientes.vue";
 import modificacionesSuscripcionesPendientes from "src/components/modificacionesSuscripcionesPendientes.vue";
+import ModificacionesHistorial from "src/components/ModificacionesHistorial.vue";
+import PagosHistorial from "src/components/PagosHistorial.vue";
 
 const userStore = useUserStore();
 const tab = ref("pagos");
+const tabModificaciones = ref("pendientes");
+const tabPagos = ref("pendientes");
 </script>
 <style scoped>
 .page-main {

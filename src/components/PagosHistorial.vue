@@ -17,7 +17,7 @@
       >
         <template v-slot:top>
           <div class="row q-py-none q-my-none" style="width: 100%">
-            <h6 class="col-4 texto-3 q-my-none">Suscripciones Pendientes</h6>
+            <h6 class="col-4 texto-3 q-my-none">Historial Suscripciones</h6>
           </div>
         </template>
         <template v-slot:body-cell-suscriptor="{ row }">
@@ -31,11 +31,11 @@
           </q-td>
         </template>
         <template v-slot:body-cell-cantidadPlanes="{ row }">
-          <q-td v-if="row?.cantidad">
-            {{ row?.cantidad }}
+          <q-td v-if="row?.dataSubDominio && row?.dataSubDominio?.cantPlanes">
+            {{ row?.dataSubDominio?.cantPlanes }}
           </q-td>
           <q-td v-else>
-            {{ row?.dataSubDominio?.cantPlanes }}
+            {{ row?.cantidad }}
           </q-td>
         </template>
         <template v-slot:body-cell-plan="{ row }">
@@ -173,6 +173,14 @@ const headers = computed(() => {
       sortable: false,
     },
     {
+      name: "cantidadMeses",
+      align: "left",
+      label: "Cant.Meses",
+      field: "meses",
+      headerStyle: "width: 35px; white-space: normal",
+      sortable: false,
+    },
+    {
       name: "metodoPago",
       align: "left",
       label: "Metodo de Pago",
@@ -192,6 +200,13 @@ const headers = computed(() => {
       align: "left",
       label: "Referencia",
       field: "referencia",
+      sortable: false,
+    },
+    {
+      name: "estado",
+      align: "left",
+      label: "Estado",
+      field: "estado",
       sortable: false,
     },
     {
@@ -220,8 +235,8 @@ const getSuscripciones = async () => {
   try {
     loader.value = true;
     const body = {
-      tipo: "cambio",
-      estado: "Pendiente",
+      tipo: "pago",
+      estado: "historial",
       itemsPorPagina: pagination.value.rowsPerPage,
       pagina: pagination.value.page,
     };
@@ -254,19 +269,6 @@ const openForm = (item) => {
 };
 const activarSuscripcion = async ($event) => {
   console.log($event);
-  $event.modulosId = [];
-  for (const modulosPlan of $event?.plan?.modulos) {
-    if (!modulosPlan?.activo) continue;
-    if (modulosPlan.modulos && modulosPlan.modulos[0]) {
-      for (const modulo of modulosPlan.modulos) {
-        const keyModulo = listOfModules.value.find((e) => e.nombre === modulo);
-        const indexKey = $event?.modulosId?.findIndex(
-          (e) => e === keyModulo.key,
-        );
-        if (indexKey === -1) $event.modulosId.push(keyModulo.key);
-      }
-    }
-  }
   try {
     const body = {
       ...$event,
@@ -289,7 +291,7 @@ const activarSuscripcion = async ($event) => {
 const rechazarSolicitud = async () => {
   loaderDelete.value = true;
   const body = {
-    ...suscripcionData.value,
+    _id: suscripcionData.value._id,
   };
   try {
     const { data } = await Endpoint.suscripciones({
