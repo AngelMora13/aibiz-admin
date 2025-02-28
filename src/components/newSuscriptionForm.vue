@@ -52,6 +52,24 @@
           <div>
             <strong>Referencia:</strong> {{ suscripcion?.pago?.referencia }}
           </div>
+          <div>
+            <strong>Pago:</strong>
+            {{
+              suscripcion?.pago?.monto?.toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })
+            }}
+            Bs ||
+            <strong>Pago en divisas:</strong>
+            {{
+              suscripcion?.pago?.montoDivisas?.toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })
+            }}
+            $
+          </div>
         </div>
       </div>
     </q-card-section>
@@ -199,9 +217,9 @@
           ></q-input>
         </div>
         <div class="col-1 column q-pa-none q-py-xs">
-          <p style="font-size: 10px; margin: 0">Cant. Meses</p>
+          <p style="font-size: 10px; margin: 0">Cant. Años</p>
           <q-input
-            v-model="empresaData.meses"
+            v-model="empresaData.years"
             type="number"
             min="1"
             outlined
@@ -284,7 +302,33 @@
     </div>
     <div
       class="col-12 flex justify-between"
-      v-if="suscripcion?.estado === 'Pendiente'"
+      v-if="
+        suscripcion?.estado === 'Pendiente' &&
+        suscripcion?.tipo === 'suscripcion'
+      "
+    >
+      <q-btn
+        :loading="laoderRechazar"
+        unelevated
+        color="negative"
+        class="q-mt-md text-capitalize"
+        @click="rechazarSolicitud"
+        >Rechazar
+      </q-btn>
+      <q-btn
+        @click="avisoActivacion = true"
+        unelevated
+        color="secondary"
+        class="q-mt-md text-capitalize"
+        >Aprobar
+      </q-btn>
+    </div>
+    <div
+      class="col-12 flex justify-between"
+      v-if="
+        suscripcion?.estado === 'Pendiente' &&
+        suscripcion?.tipo !== 'suscripcion'
+      "
     >
       <q-btn
         :loading="laoderRechazar"
@@ -304,6 +348,44 @@
       </q-btn>
     </div>
   </q-form>
+  <q-dialog
+    v-model="avisoActivacion"
+    @keydown.esc.stop="avisoActivacion = false"
+    persistent
+  >
+    <q-card style="width: 600px; max-width: 80vw">
+      <!-- Botón de cierre (X) -->
+      <q-card-section class="row items-center q-pb-none">
+        <div class="text-h6">Confirmación</div>
+        <q-space />
+        <q-btn icon="close" flat round dense @click="avisoActivacion = false" />
+      </q-card-section>
+      <q-separator color="black" inset />
+
+      <!-- Contenido del diálogo -->
+      <q-card-section>
+        <div>
+          <p>
+            <strong>¿Está seguro de que desea aprobar esta solicitud?</strong>
+          </p>
+          <p>
+            Una vez aprobada, el proceso puede tardar unos minutos en
+            completarse. Durante este tiempo, le pedimos no cierre esta ventana
+            ni realice otras acciones hasta que el proceso haya finalizado.
+          </p>
+        </div>
+      </q-card-section>
+
+      <!-- Acción de confirmación -->
+      <q-card-actions align="right">
+        <q-btn
+          label="Confirmar"
+          color="secondary"
+          @click="activarSuscripcion"
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup>
@@ -325,6 +407,7 @@ const empresaForm = ref(null);
 const empresaData = ref({});
 const loaderCreate = ref(false);
 const laoderRechazar = ref(false);
+const avisoActivacion = ref(false);
 
 onMounted(() => {
   suscripcion.value = props.suscripcionData;
@@ -356,6 +439,7 @@ onMounted(() => {
       props.suscripcionData?.dataSubDominio?.cantPlanes,
     cantidadAnterior: props.suscripcionData?.cantidadAnterior,
     meses: props.suscripcionData?.meses,
+    years: props.suscripcionData?.years,
     nombreRepresentante:
       props.suscripcionData?.dataSubDominio?.nombreRepresentante ||
       props.suscripcionData?.empresa?.nombreRepresentante,

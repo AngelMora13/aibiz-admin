@@ -16,26 +16,13 @@
         :loading="loader"
       >
         <template v-slot:top>
-          <div class="row q-py-none q-my-none" style="width: 100%">
-            <h6 class="col-4 texto-3 q-my-none">Suscripciones Pendientes</h6>
+          <div class="row" style="width: 100%">
+            <h2 class="col-4 texto-3 q-my-none">Nuevas Suscripciones</h2>
           </div>
         </template>
         <template v-slot:body-cell-suscriptor="{ row }">
           <q-td>
             {{ row?.suscriptor?.nombre }}
-          </q-td>
-        </template>
-        <template v-slot:body-cell-razonSocial="{ row }">
-          <q-td>
-            {{ row?.empresa?.nombre }}
-          </q-td>
-        </template>
-        <template v-slot:body-cell-cantidadPlanes="{ row }">
-          <q-td v-if="row?.cantidad">
-            {{ row?.cantidad }}
-          </q-td>
-          <q-td v-else>
-            {{ row?.dataSubDominio?.cantPlanes }}
           </q-td>
         </template>
         <template v-slot:body-cell-plan="{ row }">
@@ -55,7 +42,7 @@
         </template>
         <template v-slot:body-cell-banco="{ row }">
           <q-td>
-            {{ row?.pago?.banco }}
+            {{ row?.pago?.banco || row?.pago?.correo }}
           </q-td>
         </template>
         <template v-slot:body-cell-referencia="{ row }">
@@ -63,9 +50,9 @@
             {{ row?.pago?.referencia }}
           </q-td>
         </template>
-        <template v-slot:body-cell-fechaSolicitud="{ row }">
+        <template v-slot:body-cell-fechaPago="{ row }">
           <q-td>
-            {{ qDate(row?.fechaCreacion).format("DD-MM-YYYY") }}
+            {{ qDate(row?.pago?.fechaPago).format("DD-MM-YYYY") }}
           </q-td>
         </template>
         <template v-slot:body-cell-acciones="{ row }">
@@ -95,8 +82,6 @@
         <newSuscriptionForm
           :suscripcion-data="suscripcionData"
           :loader-action="loaderActions"
-          @activar-suscripcion="activarSuscripcion"
-          @rechazar-solicitud="rechazarSolicitud"
         />
       </q-card>
     </q-dialog>
@@ -163,7 +148,7 @@ const headers = computed(() => {
       name: "tipoPlan",
       align: "left",
       label: "Tipo de Plan",
-      field: "tipoPlan",
+      field: "tipo",
       sortable: false,
     },
     {
@@ -171,6 +156,14 @@ const headers = computed(() => {
       align: "left",
       label: "Cant.Planes",
       field: "cantidad",
+      headerStyle: "width: 35px; white-space: normal",
+      sortable: false,
+    },
+    {
+      name: "cantidadMeses",
+      align: "left",
+      label: "Cant.Meses",
+      field: "meses",
       headerStyle: "width: 35px; white-space: normal",
       sortable: false,
     },
@@ -197,10 +190,10 @@ const headers = computed(() => {
       sortable: false,
     },
     {
-      name: "fechaSolicitud",
+      name: "estado",
       align: "left",
-      label: "Fecha de Solicitud",
-      field: "fechaCreacion",
+      label: "Estado",
+      field: "estado",
       headerStyle: "width: 35px; white-space: normal",
       sortable: false,
     },
@@ -222,8 +215,8 @@ const getSuscripciones = async () => {
   try {
     loader.value = true;
     const body = {
-      tipo: "cambio",
-      estado: "Pendiente",
+      tipo: "suscripcion",
+      estado: "historial",
       itemsPorPagina: pagination.value.rowsPerPage,
       pagina: pagination.value.page,
     };
@@ -231,7 +224,6 @@ const getSuscripciones = async () => {
       body,
       path: "get",
     });
-    console.log({ data });
     suscripciones.value = data.suscripciones;
     pagination.value.rowsNumber = data.countSuscripciones || 0;
   } catch (e) {
@@ -254,66 +246,21 @@ const openForm = (item) => {
   suscripcionData.value = item;
   openDialogForm.value = true;
 };
-const activarSuscripcion = async ($event) => {
-  console.log($event);
-  $event.modulosId = [];
-  for (const modulosPlan of $event?.plan?.modulos) {
-    if (!modulosPlan?.activo) continue;
-    if (modulosPlan.modulos && modulosPlan.modulos[0]) {
-      for (const modulo of modulosPlan.modulos) {
-        const keyModulo = listOfModules.value.find((e) => e.nombre === modulo);
-        const indexKey = $event?.modulosId?.findIndex(
-          (e) => e === keyModulo.key,
-        );
-        if (indexKey === -1) $event.modulosId.push(keyModulo.key);
-      }
-    }
-  }
-  try {
-    const body = {
-      ...$event,
-    };
-    const { data } = await Endpoint.suscripciones({
-      body,
-      path: "update/pagosSuscripciones",
-    });
-    getSuscripciones();
-    openDialogForm.value = false;
-  } catch (e) {
-    console.log(e);
-    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
-  } finally {
-    // openDialogForm.value = false;
-    loaderActions.value = true;
-    loaderActions.value = false;
-  }
-};
-const rechazarSolicitud = async () => {
-  loaderDelete.value = true;
-  const body = {
-    ...suscripcionData.value,
-  };
-  try {
-    const { data } = await Endpoint.suscripciones({
-      body,
-      path: "update/rechazar",
-    });
-    getSuscripciones();
-    openDialogForm.value = false;
-  } catch (e) {
-    console.log(e);
-    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
-  } finally {
-    loaderActions.value = true;
-    loaderActions.value = false;
-  }
-};
 const handleTableUpdate = (props) => {
   const { page, rowsPerPage } = props.pagination;
   pagination.value.page = page;
   pagination.value.rowsPerPage = rowsPerPage;
   return getSuscripciones();
 };
+watch(
+  () => openDeleteBanco.value,
+  (value) => {
+    if (!value) {
+      suscripcionData.value = null;
+    }
+  },
+  { deep: true },
+);
 watch(
   () => openDialogForm.value,
   (value) => {

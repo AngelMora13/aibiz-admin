@@ -39,11 +39,13 @@
           </q-td>
         </template>
         <template v-slot:body-cell-plan="{ row }">
-          <q-td v-if="row?.plan?.tipo === 'comercial'">
-            {{ row?.plan?.nombre }} (COM)
+          <q-td>
+            {{ row?.plan?.nombre }}
           </q-td>
-          <q-td v-if="row?.plan?.tipo === 'contador'">
-            {{ row?.plan?.nombre }} (CON)
+        </template>
+        <template v-slot:body-cell-tipoPlan="{ row }">
+          <q-td style="text-transform: capitalize">
+            {{ row?.plan?.tipo }}
           </q-td>
         </template>
         <template v-slot:body-cell-metodoPago="{ row }">
@@ -144,13 +146,6 @@ const headers = computed(() => {
       sortable: false,
     },
     {
-      name: "razonSocial",
-      align: "left",
-      label: "Razón Social",
-      field: "razonSocial",
-      sortable: false,
-    },
-    {
       name: "subDominio",
       align: "left",
       label: "Sub Dominio",
@@ -162,6 +157,13 @@ const headers = computed(() => {
       align: "left",
       label: "Planes",
       field: "plan",
+      sortable: false,
+    },
+    {
+      name: "tipoPlan",
+      align: "left",
+      label: "Tipo de Plan",
+      field: "tipoPlan",
       sortable: false,
     },
     {
