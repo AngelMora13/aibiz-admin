@@ -278,7 +278,6 @@ const activarSuscripcion = async ($event) => {
     alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
   } finally {
     // openDialogForm.value = false;
-    loaderActions.value = true;
     loaderActions.value = false;
   }
 };

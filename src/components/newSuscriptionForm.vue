@@ -382,6 +382,7 @@
           label="Confirmar"
           color="secondary"
           @click="activarSuscripcion"
+          :loading="loaderCreate"
         />
       </q-card-actions>
     </q-card>
