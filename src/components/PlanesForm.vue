@@ -232,7 +232,7 @@ const groupedModulos = computed(() => {
       }
       groups[modulo.tipo].push(modulo);
       return groups;
-    }, {})
+    }, {}),
   );
 });
 onMounted(() => {
@@ -241,6 +241,7 @@ onMounted(() => {
   console.log({ modulos: plan.value.modulos, dos: ModulosForPlan });
   if (props.planData) {
     plan.value = { ...props.planData };
+    plan.value.tipo = tiposPlanes.find((p) => p.value === props.planData.tipo);
   }
 });
 const guardarForm = () => {
@@ -269,7 +270,7 @@ watch(
       isFormValid.value = success;
     });
   },
-  { deep: true }
+  { deep: true },
 );
 </script>
 <style>

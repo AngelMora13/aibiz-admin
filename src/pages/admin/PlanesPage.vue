@@ -22,16 +22,25 @@
         >Agregar Plan</q-btn
       >
     </div> -->
-    <q-tabs
-      v-model="tab"
-      class="w-100"
-      align="left"
-      dense
-      active-color="secondary"
-    >
-      <q-tab name="comercial" label="Comerciales" />
-      <q-tab name="contador" label="Contador" />
-    </q-tabs>
+    <div class="row col-12 justify-between">
+      <q-tabs
+        v-model="tab"
+        class="w-100 col-10"
+        align="left"
+        dense
+        active-color="secondary"
+      >
+        <q-tab name="comercial" label="Comerciales" />
+        <q-tab name="contador" label="Contador" />
+      </q-tabs>
+      <q-btn
+        color="secondary"
+        unelevated
+        @click="openAddPlan = true"
+        class="q-mb-sm col-2"
+        >Agregar Plan</q-btn
+      >
+    </div>
     <q-tab-panels v-model="tab" class="w-100">
       <q-tab-panel name="comercial">
         <div class="grid-cards">
@@ -166,7 +175,7 @@ watch(
       itemPlan.value = null;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 </script>
 <style scoped>
