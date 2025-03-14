@@ -27,6 +27,26 @@
           :rules="rules.required"
         ></q-select>
       </div>
+      <div class="form-field">
+        <q-radio
+          v-model="banco.tipoBanco"
+          val="cajaChica"
+          label="Caja chica"
+          color="black"
+        />
+        <q-radio
+          v-model="banco.tipoBanco"
+          val="cajaPrincipal"
+          label="Caja principal"
+          color="black"
+        />
+        <q-radio
+          v-model="banco.tipoBanco"
+          val="banco"
+          label="Banco"
+          color="black"
+        />
+      </div>
     </q-form>
     <div class="row justify-end q-pt-md">
       <q-btn
@@ -65,6 +85,7 @@ const formRef = ref(null);
 const banco = ref({
   nombre: "",
   pais: "",
+  tipoBanco: "cajaChica",
 });
 const listContryOptions = ref([]);
 onMounted(() => {
@@ -89,7 +110,7 @@ const filterFn = (val, update) => {
   update(() => {
     const needle = val.toLowerCase();
     listContryOptions.value = props.listContry.filter(
-      (v) => v.name.toLowerCase().indexOf(needle) > -1
+      (v) => v.name.toLowerCase().indexOf(needle) > -1,
     );
   });
 };
@@ -100,6 +121,6 @@ watch(
       isFormValid.value = success;
     });
   },
-  { deep: true }
+  { deep: true },
 );
 </script>

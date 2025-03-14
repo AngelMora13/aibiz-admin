@@ -18,7 +18,7 @@
         >
           <template v-slot:top>
             <div class="row" style="width: 100%">
-              <h2 class="col-4 texto-3">Lista de bancos</h2>
+              <h2 class="col-4 texto-3">Lista de cajas y bancos</h2>
               <div class="col-8 flex justify-end" style="align-items: center">
                 <q-btn
                   color="black"
@@ -26,7 +26,7 @@
                   @click="openFormBanco = true"
                 >
                   <q-icon name="add" class="q-mr-sm"></q-icon>
-                  Agregar Bancos
+                  Agregar
                 </q-btn>
               </div>
             </div>
@@ -257,7 +257,7 @@ const handleTableUpdate = (props) => {
   const { page, rowsPerPage } = props.pagination;
   pagination.value.page = page;
   pagination.value.rowsPerPage = rowsPerPage;
-  return; //getMovimientos();
+  return getListBancos();
 };
 const filterFn = (val, update) => {
   if (val === "") {
