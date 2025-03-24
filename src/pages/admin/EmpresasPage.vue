@@ -263,6 +263,7 @@ const updateEmpresa = async ($event) => {
   // empresaFormData.value.documentoIdentidad = `${empresaFormData.value.tipoDocumento}${empresaFormData.value.documentoIdentidad}`;
   console.log({ e: $event });
   await endpoint.updateEmpresa($event);
+  openFormEmpresa.value = false;
 };
 const disabledEmpresa = async () => {
   console.log("desactivar", empresaFormData.value);
