@@ -286,7 +286,7 @@ const activarSuscripcion = async ($event) => {
 const rechazarSolicitud = async () => {
   loaderDelete.value = true;
   const body = {
-    _id: suscripcionData.value._id,
+    ...suscripcionData.value,
   };
   try {
     const { data } = await Endpoint.suscripciones({

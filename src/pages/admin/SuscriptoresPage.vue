@@ -61,9 +61,6 @@
             {{ date.formatDate(props.value, "DD-MM-YYYY") }}
           </q-td>
         </template>
-        <template v-slot:body-cell-documentoIdentidad="{ row }">
-          <q-td> {{ row.tipoDocumento }}{{ row.documentoIdentidad }} </q-td>
-        </template>
         <template v-slot:body-cell-acciones="props">
           <q-td :props="props">
             <q-btn flat round color="secondary" icon="attachment"></q-btn>
@@ -159,7 +156,7 @@ const suscriptoresList = computed({
         emp.subDominio
           ?.toLowerCase()
           .includes(searchInput.value.toLowerCase()) ||
-        emp.telefono?.toLowerCase().includes(searchInput.value.toLowerCase())*/
+        emp.telefono?.toLowerCase().includes(searchInput.value.toLowerCase())*/,
     );
   },
 });
@@ -170,13 +167,6 @@ const headers = computed(() => {
       label: "Nombre",
       field: "nombre",
       name: "nombre",
-      align: "left",
-      sortable: true,
-    },
-    {
-      label: "Documento de Identidad",
-      field: "documentoIdentidad",
-      name: "documentoIdentidad",
       align: "left",
       sortable: true,
     },
@@ -305,7 +295,7 @@ watch(
       accionAlert.value = "";
     }
   },
-  { deep: true }
+  { deep: true },
 );
 watch(
   () => openFormEmpresa.value,
@@ -314,7 +304,7 @@ watch(
       formType.value = "crear";
       empresaFormData.value = empresaFormDataDefault.value;
     }
-  }
+  },
 );
 </script>
 <style scoped>

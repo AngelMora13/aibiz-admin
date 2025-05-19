@@ -179,12 +179,14 @@
           placeholder="Dominio"
           dense
           outlined
-          suffix=".aibiz.com"
           color="secondary"
           readonly
         >
           <template v-slot:prepend>
             <q-icon name="language" color="secondary" />
+          </template>
+          <template v-slot:append>
+            <span style="color: black; font-size: 14px">.aibiz.app</span>
           </template>
         </q-input>
       </div>

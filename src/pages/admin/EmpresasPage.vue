@@ -121,6 +121,7 @@ import endpoint from "../../services/Endpoint";
 import EmpresaForm from "src/components/EmpresaForm.vue";
 import SearchInput from "src/components/SearchInput.vue";
 import { momentDateFull } from "src/utils/qDate";
+import { errorNotify, succesNotify } from "src/utils/alert";
 
 const userStore = useUserStore();
 const searchInput = ref("");
@@ -262,15 +263,19 @@ const updateEmpresa = async ($event) => {
   console.log("editando ando");
   // empresaFormData.value.documentoIdentidad = `${empresaFormData.value.tipoDocumento}${empresaFormData.value.documentoIdentidad}`;
   console.log({ e: $event });
-  await endpoint.updateEmpresa($event);
+  const { data } = await endpoint.updateEmpresa($event);
+  succesNotify({ message: data.status });
   openFormEmpresa.value = false;
 };
 const disabledEmpresa = async () => {
-  console.log("desactivar", empresaFormData.value);
+  console.log("desactivar");
   try {
-    await endpoint.disabledEmpresa(empresaFormData.value);
+    const { data } = await endpoint.disabledEmpresa(empresaFormData.value);
+    console.log({ data });
+    succesNotify({ message: data.status });
   } catch (e) {
     console.log(e);
+    errorNotify({ message: e.response?.data?.error || e.message });
   } finally {
     openFormEmpresa.value = false;
     getSubDominios();
@@ -284,9 +289,11 @@ const disabledMany = async () => {
   try {
     const { data } = await endpoint.disableManyEmpresas(empresaSelect.value);
     empresaSelect.value = [];
-    console.log(data);
+    console.log({ data });
+    succesNotify({ message: data.status });
   } catch (e) {
     console.log(e);
+    errorNotify({ message: e.response?.data?.error || e.message });
   } finally {
     openAlertDisableDelete.value = false;
   }
@@ -301,8 +308,10 @@ const deleteEmpresa = async () => {
     const { data } = await endpoint.deleteEmpresa(empresaFormData.value);
     empresaFormData.value = empresaFormDataDefault.value;
     console.log(data);
+    succesNotify({ message: data.status });
   } catch (e) {
     console.log(e);
+    errorNotify({ message: e.response?.data?.error || e.message });
   } finally {
     openFormEmpresa.value = false;
     getSubDominios();
@@ -314,8 +323,10 @@ const deleteMany = async () => {
     const { data } = await endpoint.deleteManyEmpresas(empresaSelect.value);
     empresaSelect.value = [];
     console.log(data);
+    succesNotify({ message: data.status });
   } catch (e) {
     console.log(e);
+    errorNotify({ message: e.response?.data?.error || e.message });
   } finally {
     openAlertDisableDelete.value = false;
   }

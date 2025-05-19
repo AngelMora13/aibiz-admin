@@ -26,13 +26,17 @@
           </q-td>
         </template>
         <template v-slot:body-cell-plan="{ row }">
-          <q-td>
-            {{ row?.plan?.nombre }}
-          </q-td>
+          <q-td> {{ row?.plan?.nombre }} ({{ row?.plan?.tipo }}) </q-td>
         </template>
-        <template v-slot:body-cell-tipoPlan="{ row }">
+        <!--<template v-slot:body-cell-tipoPlan="{ row }">
           <q-td style="text-transform: capitalize">
             {{ row?.plan?.tipo }}
+          </q-td>
+        </template>-->
+        <template v-slot:body-cell-cantidadPlanes="{ row }">
+          <q-td>
+            {{ row?.cantidad }} ({{ row.meses }}
+            {{ row.meses > 1 ? "meses" : "mes" }})
           </q-td>
         </template>
         <template v-slot:body-cell-metodoPago="{ row }">
@@ -144,13 +148,13 @@ const headers = computed(() => {
       field: "plan",
       sortable: false,
     },
-    {
+    /*{
       name: "tipoPlan",
       align: "left",
       label: "Tipo de Plan",
       field: "tipo",
       sortable: false,
-    },
+    },*/
     {
       name: "cantidadPlanes",
       align: "left",
@@ -159,14 +163,14 @@ const headers = computed(() => {
       headerStyle: "width: 35px; white-space: normal",
       sortable: false,
     },
-    {
+    /*{
       name: "cantidadMeses",
       align: "left",
       label: "Cant.Meses",
       field: "meses",
       headerStyle: "width: 35px; white-space: normal",
       sortable: false,
-    },
+    },*/
     {
       name: "metodoPago",
       align: "left",
