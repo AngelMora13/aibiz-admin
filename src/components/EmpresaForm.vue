@@ -88,6 +88,13 @@
           color="primary"
           :disable="formType === 'editar'"
           :rules="rules.requeridos"
+          @update:model-value="
+            (v) =>
+              (empresaData.subDominio = String(v || '')?.replace(
+                /[^a-zA-Z]/g,
+                '',
+              ))
+          "
         >
           <template v-slot:prepend>
             <q-icon name="language" color="secondary" />
@@ -257,7 +264,7 @@
     <q-dialog v-model="openDialogConfirmDelete">
       <q-card>
         <div class="row justify-center" style="font-size: 16px; padding: 16px">
-          <p>¿Está seguro(a) que desea eliminaresta empresa?</p>
+          <p>¿Está seguro(a) que desea eliminar esta empresa?</p>
           <span style="font-size: 14px; color: red">
             '* Se perderá toda la informacion que tenga la empresa'
           </span>
@@ -488,6 +495,17 @@ watch(
   (value) => {
     empresaForm.value?.validate().then((success) => {
       isFormValid.value = success;
+    });
+  },
+  { deep: true },
+);
+watch(
+  () => textConfirm.value,
+  (value) => {
+    console.log({
+      t: textConfirm.value,
+      e: empresaData.value.subDominio,
+      v: textConfirm.value !== empresaData.value.subDominio,
     });
   },
   { deep: true },
