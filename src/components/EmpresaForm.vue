@@ -203,6 +203,7 @@
           class="q-mt-md text-capitalize"
           @click="crearSubDominio"
           :disable="!isFormValid"
+          :loading="loadingCreate"
           >Crear</q-btn
         >
       </div>
@@ -304,6 +305,7 @@ import endpoint from "../services/Endpoint";
 import cantPlanesField from "src/components/cantPlanesField.vue";
 import { qDate } from "src/utils/qDate";
 import { tiposPlanes } from "src/constants/magicString";
+import { errorNotify, succesNotify } from "src/utils/alert";
 const props = defineProps({
   empresa: {
     required: true,
@@ -317,7 +319,13 @@ const props = defineProps({
     type: String,
   },
 });
-const emit = defineEmits(["update:empresa", "desactivar", "submit", "delete"]);
+const emit = defineEmits([
+  "update:empresa",
+  "desactivar",
+  "submit",
+  "delete",
+  "create:empresa",
+]);
 const userStore = useUserStore();
 const empresaForm = ref(null);
 const typesDocument = ["J", "V"];
@@ -328,6 +336,7 @@ const openAlertDisabled = ref(false);
 const openAlerDelete = ref(false);
 const openDialogConfirmDelete = ref(false);
 const loaderDelete = ref(false);
+const loadingCreate = ref(false);
 const textConfirm = ref("");
 /*
 const empresaData = ref({
@@ -414,6 +423,7 @@ const asignarModulosPorPlan = () => {
 };
 const crearSubDominio = async () => {
   try {
+    loadingCreate.value = true;
     const token = userStore.$state.token;
     empresaData.value.documentoIdentidad = `${empresaData.value.tipoDocumento}${empresaData.value.documentoIdentidad}`;
     empresaData.value.email = empresaData.value?.suscriptor?.email;
@@ -446,12 +456,17 @@ const crearSubDominio = async () => {
         console.log(data);
         empresaData.value = {};
         console.log(empresaData.value);
+        succesNotify({ message: data.status });
+        emit("create:empresa");
       } else {
         console.log("form no valido", success);
       }
     });
   } catch (e) {
     console.log(e);
+    errorNotify({ message: e.response?.data?.error || e.message });
+  } finally {
+    loadingCreate.value = false;
   }
 };
 const deleteSubDominio = () => {

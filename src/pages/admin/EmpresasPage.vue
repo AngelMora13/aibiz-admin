@@ -86,6 +86,7 @@
           @desactivar="disabledEmpresa"
           @submit="handleSubmit"
           @delete="deleteEmpresa"
+          @create:empresa="createEmpresa"
         ></EmpresaForm>
       </div>
     </q-dialog>
@@ -266,6 +267,10 @@ const updateEmpresa = async ($event) => {
   const { data } = await endpoint.updateEmpresa($event);
   succesNotify({ message: data.status });
   openFormEmpresa.value = false;
+};
+const createEmpresa = () => {
+  openFormEmpresa.value = false;
+  getSubDominios();
 };
 const disabledEmpresa = async () => {
   console.log("desactivar");
