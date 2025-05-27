@@ -43,7 +43,7 @@
         </q-card-actions>
       </q-card-section>
       <q-card-section class="column col-12 col-sm-6 col-md-4">
-        <div class="text-h6 text-center">Pago mobil</div>
+        <div class="text-h6 text-center">Pago movil</div>
         <q-separator />
         <q-form class="q-mt-md q-mx-auto" style="max-width: 400px">
           <div class="row">
