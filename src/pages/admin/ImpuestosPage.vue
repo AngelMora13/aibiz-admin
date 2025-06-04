@@ -166,6 +166,14 @@
               <div class="col-8 flex justify-end" style="align-items: center">
                 <q-btn
                   color="black"
+                  class="text-white text-capitalize q-mr-md"
+                  @click="openFormUT = true"
+                >
+                  <q-icon name="autorenew" class="q-mr-sm"></q-icon>
+                  Actualizar U.T
+                </q-btn>
+                <q-btn
+                  color="black"
                   class="text-white text-capitalize"
                   @click="openFormIslr = true"
                 >
@@ -446,6 +454,18 @@
           </div>
         </q-card>
       </q-dialog>
+      <q-dialog v-model="openFormUT" @keydown.esc="openFormUT = false">
+        <q-card flat class="w-100" style="max-width: 400px">
+          <div class="row justify-end">
+            <q-btn unelevated icon="close" @click="openFormUT = false"></q-btn>
+          </div>
+          <FormUT
+            :value="valorUt"
+            :listContry="listContry"
+            @guardar-ut="saveUT"
+          ></FormUT>
+        </q-card>
+      </q-dialog>
     </div>
   </q-page>
 </template>
@@ -457,6 +477,7 @@ import { useUserStore } from "stores/user-store";
 import FormIva from "src/components/IvaForm.vue";
 import formRetIva from "src/components/formRetIva.vue";
 import FormIslr from "src/components/FormIslr.vue";
+import FormUT from "src/components/FormUT.vue";
 import cicloImpuesto from "src/components/formCiclosImpuestos.vue";
 import Endpoint from "../../services/Endpoint";
 import { debounce } from "quasar";
@@ -480,6 +501,7 @@ const openFormRetIva = ref(false);
 const openDeleteRetIva = ref(false);
 const openCicloImpuesto = ref(false);
 const openDeleteCiclo = ref(false);
+const openFormUT = ref(false);
 const loaderIva = ref(false);
 const loaderIslr = ref(false);
 const loaderRetIva = ref(false);
@@ -505,10 +527,14 @@ const paginationCiclos = ref({
   rowsPerPage: 5,
   rowsNumber: 0,
 });
-const pais = ref(null);
-const paisIslr = ref(null);
-const paisRetencionIva = ref(null);
-const paisCiclos = ref(null);
+const pais = ref("Venezuela");
+const paisIslr = ref("Venezuela");
+const paisRetencionIva = ref("Venezuela");
+const paisCiclos = ref("Venezuela");
+const valorUt = ref({
+  pais: "",
+  valor: 0,
+});
 const headersIva = computed(() => {
   const header = [
     {
@@ -699,6 +725,24 @@ onMounted(async () => {
   getListRetIva();
   getCiclos();
 });
+const saveUT = async ($event) => {
+  console.log($event);
+  try {
+    const body = {
+      ...$event,
+    };
+    const { data } = await Endpoint.impuestos({
+      body,
+      path: "save/UT",
+    });
+    valorUt.value = data.ut;
+    getListIslr();
+  } catch (e) {
+    alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
+  } finally {
+    openFormUT.value = false;
+  }
+};
 const getListIva = async () => {
   try {
     loaderIva.value = true;
@@ -818,6 +862,7 @@ const getListIslr = async () => {
     console.log({ data });
     islrList.value = data.islr;
     paginationIslr.value.rowsNumber = data.countIslr || 0;
+    valorUt.value = data.ut;
   } catch (e) {
     console.log(e);
     alert(e.response?.data?.error || "Ha ocurrido un error inesperado");
